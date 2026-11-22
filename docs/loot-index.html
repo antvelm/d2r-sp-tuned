@@ -1,0 +1,256 @@
+<title>Single-Player Loot Pass</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: single reading column (~72ch) with full-width data blocks; dark stone first, cool slate light theme. */
+:root {
+  --bg: #f3f4f6; --surface: #ffffff; --sunk: #e8eaee; --line: #d3d7de;
+  --fg: #1c2026; --muted: #5b6370; --accent: #9a5b12; --accent-soft: #f1e3cf;
+  --old: #8b93a1; --new: #b8661a; --good: #2f7a4a; --bad: #a33b2b;
+  --f-display: "Cinzel", "Trajan Pro", Georgia, serif;
+  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15161a; --surface: #1d1f24; --sunk: #111216; --line: #2d3038;
+  --fg: #e6e2da; --muted: #9a978f; --accent: #e3a04a; --accent-soft: #3a2c1a;
+  --old: #6f7480; --new: #e8923a; --good: #6cc28a; --bad: #e07a63; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #15161a; --surface: #1d1f24; --sunk: #111216; --line: #2d3038;
+  --fg: #e6e2da; --muted: #9a978f; --accent: #e3a04a; --accent-soft: #3a2c1a;
+  --old: #6f7480; --new: #e8923a; --good: #6cc28a; --bad: #e07a63; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 80px }
+main { max-width: 1240px; margin: 0 auto; display: grid; gap: 56px }
+.prose { max-width: 70ch }
+h1, h2 { font-family: var(--f-display); font-weight: 700; text-wrap: balance; letter-spacing: .02em; margin: 0 }
+h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.1 }
+h2 { font-size: 22px; color: var(--accent) }
+h3 { font-size: 15px; margin: 0 }
+p { margin: 0 }
+section { display: grid; gap: 16px; min-width: 0 }
+.eyebrow { font: 600 12px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted) }
+.lede { font-size: 17px; color: var(--muted); max-width: 66ch }
+code, .mono { font-family: var(--f-mono); font-size: .9em }
+code { background: var(--sunk); padding: 1px 5px; border-radius: 4px }
+.num { font-variant-numeric: tabular-nums; font-family: var(--f-mono) }
+
+/* preset switcher */
+.switch { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.switch button { font: 600 13px/1 var(--f-body); padding: 9px 14px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg) }
+.switch button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg) }
+.switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.switch .hint { color: var(--muted); font-size: 13px }
+
+/* hour strip */
+.hours { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1px; background: var(--line);
+  border: 1px solid var(--line); border-radius: 10px; overflow: hidden }
+.hours div { background: var(--surface); padding: 14px 16px; display: grid; gap: 2px }
+.hours .rune { font-family: var(--f-display); font-weight: 700; font-size: 18px; color: var(--accent) }
+.hours .v { font: 600 20px/1.2 var(--f-mono); font-variant-numeric: tabular-nums }
+.hours .was { font-size: 12px; color: var(--muted) }
+
+/* tables */
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface) }
+table { border-collapse: collapse; width: 100%; font-size: 13px }
+th, td { padding: 8px 9px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); line-height: 1.35 }
+th:first-child, td:first-child { text-align: left; position: sticky; left: 0; background: var(--surface); white-space: normal; min-width: 120px; max-width: 170px }
+#odds td .old, #odds td .new, #odds td .x { display: block }
+#odds thead th { text-align: right }
+#odds thead th:first-child { text-align: left }
+thead th { font: 600 11px/1.2 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); background: var(--sunk) }
+thead th:first-child { background: var(--sunk) }
+tbody tr:last-child td { border-bottom: 0 }
+td .old { color: var(--old); display: block; font-size: 11px }
+td .new { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 600 }
+td .x { color: var(--good); font-size: 11px; font-family: var(--f-mono) }
+td .x.down { color: var(--bad) }
+.rn { font-family: var(--f-display); font-weight: 700; color: var(--accent) }
+
+/* chart */
+.chart { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 16px; overflow-x: auto }
+.chart svg { display: block; min-width: 760px; width: 100%; height: auto }
+.legend { display: flex; gap: 18px; font-size: 13px; color: var(--muted); flex-wrap: wrap }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; margin-right: 6px }
+
+/* rows */
+.rows { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px }
+.tc { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 14px 16px; display: grid; gap: 8px; min-width: 0 }
+.tc h3 { font-family: var(--f-mono); font-size: 13px }
+.tc dl { display: grid; grid-template-columns: 1fr auto auto; gap: 2px 14px; margin: 0; font-size: 13px }
+.tc dt { color: var(--muted); overflow-wrap: anywhere }
+.tc dd { margin: 0; text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums }
+.tc dd.o { color: var(--old) }
+.tc dd.chg { color: var(--new); font-weight: 600 }
+
+.levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px }
+.levers > div { display: grid; gap: 8px; align-content: start }
+.levers b { font-family: var(--f-mono); color: var(--accent) }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 6px }
+.callout { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 14px 18px; border-radius: 0 8px 8px 0; display: grid; gap: 6px }
+.decisions { counter-reset: d; list-style: none; padding: 0; gap: 14px }
+.decisions li { counter-increment: d; display: grid; grid-template-columns: 28px 1fr; gap: 10px }
+.decisions li::before { content: counter(d); font: 700 14px/26px var(--f-mono); text-align: center; width: 26px; height: 26px;
+  border-radius: 50%; background: var(--accent-soft); color: var(--accent) }
+footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 20px; display: grid; gap: 6px }
+@media (prefers-reduced-motion: no-preference) { .switch button { transition: background .15s, color .15s } }
+.group { display: grid; gap: 12px; min-width: 0 }
+.group h3 { font-family: var(--f-display); font-size: 17px; color: var(--fg); letter-spacing: .02em }
+.group p.note { color: var(--muted); font-size: 13.5px; max-width: 80ch }
+#items td:first-child { min-width: 200px; max-width: 260px }
+#items td.src { color: var(--muted); font-size: 12px; text-align: left; white-space: normal }
+#items tr.cat td { background: var(--sunk); font: 600 11px/1.2 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-align: left }
+.pill { display: inline-block; font: 600 11px/1 var(--f-mono); padding: 4px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent) }
+.pill.warn { background: color-mix(in srgb, var(--bad) 18%, transparent); color: var(--bad) }
+.pill.ok { background: color-mix(in srgb, var(--good) 18%, transparent); color: var(--good) }
+pre.toml { background: var(--sunk); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font: 13px/1.55 var(--f-mono); margin: 0 }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px }
+.facts > div { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; align-content: start }
+.facts b { font-family: var(--f-display) }
+</style>
+
+<main>
+  <header style="display:grid;gap:14px">
+    <span class="eyebrow">d2r-sp-tuned · loot proposal · game build 3.4.95032 · offline only</span>
+    <h1>Single-Player Loot Pass</h1>
+    <p class="lede">Uber keys, Ancient Statues, Sunder Charms, SoJs and other endgame rings and amulets, and Rainbow Facets are tuned for a trading economy of thousands of players. Solo, several of them take hundreds or thousands of hours. This proposal adds a <b>Loot</b> part to SPTuned, with its own on/off switch and presets. All figures come from the game's tables extracted from this install, with no Magic Find, and with the current Runes (SP) and Bosses parts on.</p>
+  </header>
+
+  <section>
+    <div class="switch" role="group" aria-label="Loot preset">
+      <button type="button" id="p-mild" data-p="mild">Mild</button>
+      <button type="button" id="p-sp" data-p="sp">SP (recommended)</button>
+      <button type="button" id="p-generous" data-p="generous">Generous</button>
+      <span class="hint" id="hint"></span>
+    </div>
+    <h2>Vanilla against proposal</h2>
+    <p class="prose">"1 in N" means kills of that boss or Herald. Ring, amulet and facet rows are hours of Hell farming at about 1,000 kills an hour in level-85 areas (900 normal, 80 champion and 20 unique monsters).</p>
+    <div class="scroll"><table id="items"></table></div>
+  </section>
+
+  <section>
+    <h2>What changes, and how</h2>
+    <div class="levers">
+      <div class="group">
+        <h3>Uber keys</h3>
+        <p>The Key of Terror, Hate and Destruction weights in the Hell Countess, Summoner and Nihlathak tables (terror-zone versions included) are multiplied. The extra weight comes out of "drop nothing", so these bosses' other drops don't change. On SP, a full set of three keys of each type takes about 10 runs of each boss instead of about 40.</p>
+      </div>
+      <div class="group">
+        <h3>Ancient Statues</h3>
+        <p>The five statues (Talic's Anguish, Korlic's Pain, Madawc's Ire, Bul-Kathos' Nightmare, Worusk's End) are combined in the cube into the portal to the Colossal Summit, the 3.x Uber Ancients fight. Each act boss's statue weight is multiplied, again taken from "drop nothing". The Bosses part keeps these rolls when it switches to quest drops.</p>
+      </div>
+      <div class="group">
+        <h3>Sunder Charms</h3>
+        <p>Latent Sunders drop only from Heralds in Hell terror zones. Their weight in Herald tables is multiplied. Those tables have no "drop nothing", so other Herald drops get <span class="num" id="heraldcut"></span> rarer. Optionally all six types become equally likely; in vanilla Black Cleft has 3 of 101 weight against Cold Rupture's 30.</p>
+      </div>
+      <div class="group">
+        <h3>Rings, amulets, facets</h3>
+        <p>Three levers on the jewelry tables only (rings, amulets, jewels, charms). Weapons and armor are untouched.</p>
+        <ul>
+          <li><b>More jewelry:</b> its share of the gem/jewelry/rune group is multiplied, with gems and runes kept at their rates (the method the Runes part uses).</li>
+          <li><b>Better quality:</b> the jewelry tables get unique/set modifiers, in the same columns the game uses to guarantee Annihilus. A unique jewel at item level 85+ is always a Rainbow Facet.</li>
+          <li><b>Fairer picks:</b> SoJ and Bul-Kathos' Wedding Band each make up 1.6% of unique rings, behind Nagelring and Manald Heal at 24.6% each. The page lists new rarity weights.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="scroll"><table id="rarity"></table></div>
+  </section>
+
+  <section>
+    <h2>Does it work offline?</h2>
+    <div class="facts">
+      <div><b>Pandemonium and Uber Tristram</b><span class="pill ok">works offline</span><p>Three keys in the cube open the three mini-uber portals; the organs (guaranteed drops) open Uber Tristram and the Hellfire Torch. Blizzard forum: <a href="https://eu.forums.blizzard.com/en/d2r/t/confirmed-pandemonium-event-and-annihilus-are-available-in-offline-modesingle-player/21439">confirmed available offline</a>.</p></div>
+      <div><b>Diablo Clone and Annihilus</b><span class="pill ok">works offline</span><p>Offline, selling <b>one</b> Stone of Jordan to a vendor in Hell spawns Diablo Clone, which always drops Annihilus (<a href="https://maxroll.gg/d2/meta/diablo-clone">maxroll</a>). More SoJs mean more Annihilus.</p></div>
+      <div><b>Sunder Charms</b><span class="pill warn">check in game</span><p>The Herald sunder table is flagged ladder season 2 in the data, and guides disagree on the 3.x offline rules. The boost only helps if Heralds drop Sunders in your offline games. Worth one terror-zone session to confirm.</p></div>
+      <div><b>Essences</b><span class="pill warn">side effect of Bosses</span><p>Quest drop tables give essences less often (weight 1 instead of 3), so with Bosses on, Mephisto, Diablo and Baal drop essences 1 in 10.1 kills instead of 1 in 8.3. Loot SP multiplies essences ×2, which more than restores it.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Settings</h2>
+    <p class="prose">One new section in <code>settings.toml</code>. Use a preset, or set <code>preset = "custom"</code> and tune each value. Every value set to 1 or 0 means vanilla.</p>
+    <pre class="toml" id="toml"></pre>
+  </section>
+
+  <section class="prose">
+    <h2>Decisions for you</h2>
+    <ol class="decisions">
+      <li><span><b>Preset.</b> SP puts SoJ at about 1 every 11 hours of farming and a facet about every 5 hours, roughly the same as Ber in the Runes SP preset. Mild is about twice as slow and Generous about twice as fast.</span></li>
+      <li><span><b>Sunder types equal?</b> On by default in SP and Generous. Turn it off to keep vanilla's "Cold Rupture common, Black Cleft rare".</span></li>
+      <li><span><b>Rarity list.</b> SoJ, Bul-Kathos, Mara's, Highlord's, Cat's Eye, Atma's, Metalgrid, Seraph's Hymn and Wisp get higher weights. Add or remove names as you like.</span></li>
+    </ol>
+  </section>
+
+  <section class="prose">
+    <h2>Not in this pass</h2>
+    <p>Unique and set weapons and armor, and replacing Magic Find with flat tuned rates, are a larger separate change to quality odds for every item class. The jewelry levers here could be widened to all items later.</p>
+  </section>
+
+  <footer>
+    <p>Method: the expected value of every drop chain, plus the game's quality roll for rings, amulets and jewels (itemratio: unique 400/1/6400, set 160/2/5600) with the highest table modifier on the chain. No Magic Find. It ignores the six-item cap per kill. Sources: <code>tools/loot.py</code> and <code>tools/make_loot_page.py</code>.</p>
+  </footer>
+</main>
+
+<script>
+const DATA = {"presets":{"mild":{"Key of Terror":{"per":0.14705882352941177,"unit":"boss kill","src":"Countess (H)"},"Key of Hate":{"per":0.17857142857142855,"unit":"boss kill","src":"Summoner (H)"},"Key of Destruction":{"per":0.1639344262295082,"unit":"boss kill","src":"Nihlathak (H)"},"Talic's Anguish (Act 1)":{"per":0.09032258064516129,"unit":"boss kill","src":"Andarielq (H)"},"Korlic's Pain (Act 2)":{"per":0.2320441988950276,"unit":"boss kill","src":"Durielq (H) SP"},"Madawc's Ire (Act 3)":{"per":0.072,"unit":"boss kill","src":"Mephistoq (H) SP"},"Bul-Kathos' Nightmare (Act 4)":{"per":0.072,"unit":"boss kill","src":"Diabloq (H) SP"},"Worusk's End (Act 5)":{"per":0.072,"unit":"boss kill","src":"Baalq (H) SP"},"Latent Sunder Charm (any)":{"per":0.044120891242003094,"unit":"Herald kill","src":"Act 5 (H) Herald A"},"Black Cleft (rarest Sunder)":{"per":0.0013105215220396958,"unit":"Herald kill","src":"Act 5 (H) Herald A"},"The Stone of Jordan":{"per":0.03505928525397462,"unit":"hour","src":"Hell lvl-85 farming"},"Bul-Kathos' Wedding Band":{"per":0.03505928525397462,"unit":"hour","src":"Hell lvl-85 farming"},"Mara's Kaleidoscope":{"per":0.013597760168597635,"unit":"hour","src":"Hell lvl-85 farming"},"Highlord's Wrath":{"per":0.013597760168597635,"unit":"hour","src":"Hell lvl-85 farming"},"Any unique ring":{"per":0.2909920676079894,"unit":"hour","src":"Hell lvl-85 farming"},"Any unique amulet":{"per":0.1454960338039947,"unit":"hour","src":"Hell lvl-85 farming"},"Rainbow Facet":{"per":0.07274801690199735,"unit":"hour","src":"Hell lvl-85 farming"},"Set ring/amulet":{"per":0.1364344612039121,"unit":"hour","src":"Hell lvl-85 farming"},"Rings + amulets (all qualities)":{"per":4.301718325525,"unit":"hour","src":"Hell lvl-85 farming"},"Essence of Suffering":{"per":0.17562724014336917,"unit":"boss kill","src":"Andarielq (H)"},"Essence of Hatred":{"per":0.09859154929577466,"unit":"boss kill","src":"Mephistoq (H) SP"},"Essence of Terror":{"per":0.09859154929577466,"unit":"boss kill","src":"Diabloq (H) SP"},"Essence of Destruction":{"per":0.09859154929577466,"unit":"boss kill","src":"Baalq (H) SP"},"_rune_floor_fails":0},"sp":{"Key of Terror":{"per":0.29411764705882354,"unit":"boss kill","src":"Countess (H)"},"Key of Hate":{"per":0.3571428571428571,"unit":"boss kill","src":"Summoner (H)"},"Key of Destruction":{"per":0.3278688524590164,"unit":"boss kill","src":"Nihlathak (H)"},"Talic's Anguish (Act 1)":{"per":0.13548387096774195,"unit":"boss kill","src":"Andarielq (H)"},"Korlic's Pain (Act 2)":{"per":0.34806629834254144,"unit":"boss kill","src":"Durielq (H) SP"},"Madawc's Ire (Act 3)":{"per":0.10800000000000001,"unit":"boss kill","src":"Mephistoq (H) SP"},"Bul-Kathos' Nightmare (Act 4)":{"per":0.10800000000000001,"unit":"boss kill","src":"Diabloq (H) SP"},"Worusk's End (Act 5)":{"per":0.10800000000000001,"unit":"boss kill","src":"Baalq (H) SP"},"Latent Sunder Charm (any)":{"per":0.08497440146155971,"unit":"Herald kill","src":"Act 5 (H) Herald A"},"Black Cleft (rarest Sunder)":{"per":0.014162400243593285,"unit":"Herald kill","src":"Act 5 (H) Herald A"},"The Stone of Jordan":{"per":0.09297065516230936,"unit":"hour","src":"Hell lvl-85 farming"},"Bul-Kathos' Wedding Band":{"per":0.09297065516230936,"unit":"hour","src":"Hell lvl-85 farming"},"Mara's Kaleidoscope":{"per":0.03605871204893307,"unit":"hour","src":"Hell lvl-85 farming"},"Highlord's Wrath":{"per":0.03605871204893307,"unit":"hour","src":"Hell lvl-85 farming"},"Any unique ring":{"per":0.7716564378471678,"unit":"hour","src":"Hell lvl-85 farming"},"Any unique amulet":{"per":0.3858282189235839,"unit":"hour","src":"Hell lvl-85 farming"},"Rainbow Facet":{"per":0.19291410946179194,"unit":"hour","src":"Hell lvl-85 farming"},"Set ring/amulet":{"per":0.5027221073599235,"unit":"hour","src":"Hell lvl-85 farming"},"Rings + amulets (all qualities)":{"per":8.555794361144475,"unit":"hour","src":"Hell lvl-85 farming"},"Essence of Suffering":{"per":0.35125448028673834,"unit":"boss kill","src":"Andarielq (H)"},"Essence of Hatred":{"per":0.1971830985915493,"unit":"boss kill","src":"Mephistoq (H) SP"},"Essence of Terror":{"per":0.1971830985915493,"unit":"boss kill","src":"Diabloq (H) SP"},"Essence of Destruction":{"per":0.1971830985915493,"unit":"boss kill","src":"Baalq (H) SP"},"_rune_floor_fails":0},"generous":{"Key of Terror":{"per":0.5882352941176471,"unit":"boss kill","src":"Countess (H)"},"Key of Hate":{"per":0.7142857142857142,"unit":"boss kill","src":"Summoner (H)"},"Key of Destruction":{"per":0.6557377049180328,"unit":"boss kill","src":"Nihlathak (H)"},"Talic's Anguish (Act 1)":{"per":0.22580645161290322,"unit":"boss kill","src":"Andarielq (H)"},"Korlic's Pain (Act 2)":{"per":0.580110497237569,"unit":"boss kill","src":"Durielq (H) SP"},"Madawc's Ire (Act 3)":{"per":0.18,"unit":"boss kill","src":"Mephistoq (H) SP"},"Bul-Kathos' Nightmare (Act 4)":{"per":0.18,"unit":"boss kill","src":"Diabloq (H) SP"},"Worusk's End (Act 5)":{"per":0.18,"unit":"boss kill","src":"Baalq (H) SP"},"Latent Sunder Charm (any)":{"per":0.16254876462938883,"unit":"Herald kill","src":"Act 5 (H) Herald A"},"Black Cleft (rarest Sunder)":{"per":0.027091460771564803,"unit":"Herald kill","src":"Act 5 (H) Herald A"},"The Stone of Jordan":{"per":0.2080839180133841,"unit":"hour","src":"Hell lvl-85 farming"},"Bul-Kathos' Wedding Band":{"per":0.2080839180133841,"unit":"hour","src":"Hell lvl-85 farming"},"Mara's Kaleidoscope":{"per":0.08070544483696675,"unit":"hour","src":"Hell lvl-85 farming"},"Highlord's Wrath":{"per":0.08070544483696675,"unit":"hour","src":"Hell lvl-85 farming"},"Any unique ring":{"per":1.7270965195110883,"unit":"hour","src":"Hell lvl-85 farming"},"Any unique amulet":{"per":0.8635482597555442,"unit":"hour","src":"Hell lvl-85 farming"},"Rainbow Facet":{"per":0.4317741298777721,"unit":"hour","src":"Hell lvl-85 farming"},"Set ring/amulet":{"per":1.3828838098661755,"unit":"hour","src":"Hell lvl-85 farming"},"Rings + amulets (all qualities)":{"per":12.766599275061743,"unit":"hour","src":"Hell lvl-85 farming"},"Essence of Suffering":{"per":0.5268817204301075,"unit":"boss kill","src":"Andarielq (H)"},"Essence of Hatred":{"per":0.29577464788732394,"unit":"boss kill","src":"Mephistoq (H) SP"},"Essence of Terror":{"per":0.29577464788732394,"unit":"boss kill","src":"Diabloq (H) SP"},"Essence of Destruction":{"per":0.29577464788732394,"unit":"boss kill","src":"Baalq (H) SP"},"_rune_floor_fails":0},"vanilla":{"Key of Terror":{"per":0.07352941176470588,"unit":"boss kill","src":"Countess (H)"},"Key of Hate":{"per":0.08928571428571427,"unit":"boss kill","src":"Summoner (H)"},"Key of Destruction":{"per":0.0819672131147541,"unit":"boss kill","src":"Nihlathak (H)"},"Talic's Anguish (Act 1)":{"per":0.04516129032258064,"unit":"boss kill","src":"Andarielq (H)"},"Korlic's Pain (Act 2)":{"per":0.1160220994475138,"unit":"boss kill","src":"Duriel (H)"},"Madawc's Ire (Act 3)":{"per":0.036,"unit":"boss kill","src":"Mephisto (H)"},"Bul-Kathos' Nightmare (Act 4)":{"per":0.036,"unit":"boss kill","src":"Diablo (H)"},"Worusk's End (Act 5)":{"per":0.036,"unit":"boss kill","src":"Baal (H)"},"Latent Sunder Charm (any)":{"per":0.022158209616662972,"unit":"Herald kill","src":"Act 5 (H) Herald A"},"Black Cleft (rarest Sunder)":{"per":0.0006581646420790982,"unit":"Herald kill","src":"Act 5 (H) Herald A"},"The Stone of Jordan":{"per":0.00029396111352205897,"unit":"hour","src":"Hell lvl-85 farming"},"Bul-Kathos' Wedding Band":{"per":0.00029396111352205897,"unit":"hour","src":"Hell lvl-85 farming"},"Mara's Kaleidoscope":{"per":0.0005898561817383419,"unit":"hour","src":"Hell lvl-85 farming"},"Highlord's Wrath":{"per":0.0005898561817383419,"unit":"hour","src":"Hell lvl-85 farming"},"Any unique ring":{"per":0.017931627924845595,"unit":"hour","src":"Hell lvl-85 farming"},"Any unique amulet":{"per":0.008965813962422797,"unit":"hour","src":"Hell lvl-85 farming"},"Rainbow Facet":{"per":0.004482906981211399,"unit":"hour","src":"Hell lvl-85 farming"},"Set ring/amulet":{"per":0.07133559489515587,"unit":"hour","src":"Hell lvl-85 farming"},"Rings + amulets (all qualities)":{"per":4.301718325525,"unit":"hour","src":"Hell lvl-85 farming"},"Essence of Suffering":{"per":0.17562724014336917,"unit":"boss kill","src":"Andarielq (H)"},"Essence of Hatred":{"per":0.12000000000000001,"unit":"boss kill","src":"Mephisto (H)"},"Essence of Terror":{"per":0.12000000000000001,"unit":"boss kill","src":"Diablo (H)"},"Essence of Destruction":{"per":0.12000000000000001,"unit":"boss kill","src":"Baal (H)"},"_rune_floor_fails":0}},"params":{"mild":{"uber_keys_mult":2,"ancient_statue_mult":2,"sunder_mult":2,"sunder_even_types":false,"essence_mult":1,"jewelry_mult":1,"jewelry_unique_mod":992,"jewelry_set_mod":768,"chase_jewelry_rarity":true},"sp":{"uber_keys_mult":4,"ancient_statue_mult":3,"sunder_mult":4,"sunder_even_types":true,"essence_mult":2,"jewelry_mult":2,"jewelry_unique_mod":1000,"jewelry_set_mod":896,"chase_jewelry_rarity":true},"generous":{"uber_keys_mult":8,"ancient_statue_mult":5,"sunder_mult":8,"sunder_even_types":true,"essence_mult":3,"jewelry_mult":3,"jewelry_unique_mod":1008,"jewelry_set_mod":960,"chase_jewelry_rarity":true}},"rarity":{"The Stone of Jordan":10,"Bul Katho's Wedding Band":10,"Wisp":5,"Mara's Kaleidoscope":10,"Highlord's Wrath":10,"The Cat's Eye":10,"Atma's Scarab":10,"Metalgrid":8,"Seraph's Hymn":8}};
+const GROUPS = [
+  ["Uber keys", ["Key of Terror", "Key of Hate", "Key of Destruction"]],
+  ["Ancient Statues (Colossal Summit portal)", ["Talic's Anguish (Act 1)", "Korlic's Pain (Act 2)", "Madawc's Ire (Act 3)", "Bul-Kathos' Nightmare (Act 4)", "Worusk's End (Act 5)"]],
+  ["Sunder Charms (Hell terror-zone Heralds)", ["Latent Sunder Charm (any)", "Black Cleft (rarest Sunder)"]],
+  ["Rings, amulets, facets (hours of farming)", ["The Stone of Jordan", "Bul-Kathos' Wedding Band", "Mara's Kaleidoscope", "Highlord's Wrath", "Any unique ring", "Any unique amulet", "Set ring/amulet", "Rainbow Facet", "Rings + amulets (all qualities)"]],
+  ["Essences (Token of Absolution)", ["Essence of Suffering", "Essence of Hatred", "Essence of Terror", "Essence of Destruction"]],
+];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+const n0 = x => x >= 100 ? Math.round(x).toLocaleString("en-US") : x >= 10 ? x.toFixed(0) : x.toFixed(1);
+function cell(v) {
+  if (!v || !v.per) return "–";
+  if (v.unit === "hour") return v.per >= 1 ? `${v.per.toFixed(1)} / h` : `every ${n0(1 / v.per)} h`;
+  return v.per >= 1 ? `${v.per.toFixed(1)} per kill` : `1 in ${n0(1 / v.per)}`;
+}
+let cur = "sp";
+try { const s = localStorage.getItem("loot-preset"); if (s && DATA.presets[s]) cur = s; } catch (e) {}
+
+function render() {
+  document.querySelectorAll(".switch button").forEach(b => b.setAttribute("aria-pressed", b.dataset.p === cur));
+  const P = DATA.presets[cur], V = DATA.presets.vanilla, prm = DATA.params[cur];
+  document.getElementById("hint").textContent = `keys ×${prm.uber_keys_mult} · statues ×${prm.ancient_statue_mult} · sunders ×${prm.sunder_mult} · jewelry ×${prm.jewelry_mult}, unique ${prm.jewelry_unique_mod}/1024`;
+  const cut = 1 - 407 / (405 + 2 * prm.sunder_mult);
+  document.getElementById("heraldcut").textContent = (cut * 100).toFixed(1) + "%";
+  let t = `<thead><tr><th>Item</th><th>Vanilla</th><th>${cur === "sp" ? "SP" : cur[0].toUpperCase() + cur.slice(1)}</th><th>Change</th><th>Per</th></tr></thead><tbody>`;
+  for (const [g, items] of GROUPS) {
+    t += `<tr class="cat"><td colspan="5">${esc(g)}</td></tr>`;
+    for (const k of items) {
+      const a = V[k], b = P[k];
+      const x = a && b && a.per ? b.per / a.per : null;
+      const xs = x == null ? "" : `<span class="x${x < 0.999 ? " down" : ""}">${x >= 10 ? Math.round(x) : x.toFixed(1)}×</span>`;
+      t += `<tr><td>${esc(k)}</td><td><span class="old">${cell(a)}</span></td><td><span class="new">${cell(b)}</span></td><td>${xs}</td><td class="src">${esc(b ? b.unit : "")}</td></tr>`;
+    }
+  }
+  document.getElementById("items").innerHTML = t + "</tbody>";
+  const rows = Object.entries(DATA.rarity);
+  const van = {"The Stone of Jordan":1,"Bul Katho's Wedding Band":1,"Wisp":1,"Mara's Kaleidoscope":5,"Highlord's Wrath":5,"The Cat's Eye":5,"Atma's Scarab":5,"Metalgrid":2,"Seraph's Hymn":3};
+  document.getElementById("rarity").innerHTML = `<thead><tr><th>Unique ring / amulet</th><th>Vanilla rarity</th><th>Proposed</th></tr></thead><tbody>` +
+    rows.map(([n, w]) => `<tr><td>${esc(n)}</td><td>${van[n] ?? "?"}</td><td><span class="new">${w}</span></td></tr>`).join("") + "</tbody>";
+  document.getElementById("toml").textContent =
+`[loot]
+enabled = true
+preset = "${cur}"               # mild | sp | generous | custom
+# custom only (1 / 0 = vanilla):
+uber_keys_mult = ${prm.uber_keys_mult}
+ancient_statue_mult = ${prm.ancient_statue_mult}
+sunder_mult = ${prm.sunder_mult}
+sunder_even_types = ${prm.sunder_even_types}
+essence_mult = ${prm.essence_mult}
+jewelry_mult = ${prm.jewelry_mult}          # rings/amulets/jewels/charms share
+jewelry_unique_mod = ${prm.jewelry_unique_mod}   # 0..1024, higher = more uniques
+jewelry_set_mod = ${prm.jewelry_set_mod}
+chase_jewelry_rarity = ${prm.chase_jewelry_rarity}`;
+}
+document.querySelectorAll(".switch button").forEach(b => b.addEventListener("click", () => {
+  cur = b.dataset.p; try { localStorage.setItem("loot-preset", cur); } catch (e) {} render();
+}));
+render();
+</script>

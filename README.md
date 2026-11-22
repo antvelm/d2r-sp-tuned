@@ -10,6 +10,8 @@
 
 **Rune design with all the numbers:** [docs/rune-proposal.html](docs/rune-proposal.html). Download it and open it in a browser; GitHub shows HTML as source.
 
+**Proposed next part, Loot** (uber keys, Ancient Statues, Sunder Charms, SoJ and other endgame jewelry, Rainbow Facets): [docs/loot-proposal.html](docs/loot-proposal.html). Not in the build yet.
+
 ## Quick start
 
 Requirements: Windows, Python 3.11+, and a built [CascLib](https://github.com/ladislav-zezula/CascLib) `CascLib.dll` (CMake + Visual Studio: `cmake -S . -B build -A x64 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 && cmake --build build --config Release`).

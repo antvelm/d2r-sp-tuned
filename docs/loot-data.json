@@ -1,0 +1,522 @@
+{
+ "presets": {
+  "mild": {
+   "Key of Terror": {
+    "per": 0.14705882352941177,
+    "unit": "boss kill",
+    "src": "Countess (H)"
+   },
+   "Key of Hate": {
+    "per": 0.17857142857142855,
+    "unit": "boss kill",
+    "src": "Summoner (H)"
+   },
+   "Key of Destruction": {
+    "per": 0.1639344262295082,
+    "unit": "boss kill",
+    "src": "Nihlathak (H)"
+   },
+   "Talic's Anguish (Act 1)": {
+    "per": 0.09032258064516129,
+    "unit": "boss kill",
+    "src": "Andarielq (H)"
+   },
+   "Korlic's Pain (Act 2)": {
+    "per": 0.2320441988950276,
+    "unit": "boss kill",
+    "src": "Durielq (H) SP"
+   },
+   "Madawc's Ire (Act 3)": {
+    "per": 0.072,
+    "unit": "boss kill",
+    "src": "Mephistoq (H) SP"
+   },
+   "Bul-Kathos' Nightmare (Act 4)": {
+    "per": 0.072,
+    "unit": "boss kill",
+    "src": "Diabloq (H) SP"
+   },
+   "Worusk's End (Act 5)": {
+    "per": 0.072,
+    "unit": "boss kill",
+    "src": "Baalq (H) SP"
+   },
+   "Latent Sunder Charm (any)": {
+    "per": 0.044120891242003094,
+    "unit": "Herald kill",
+    "src": "Act 5 (H) Herald A"
+   },
+   "Black Cleft (rarest Sunder)": {
+    "per": 0.0013105215220396958,
+    "unit": "Herald kill",
+    "src": "Act 5 (H) Herald A"
+   },
+   "The Stone of Jordan": {
+    "per": 0.03505928525397462,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Bul-Kathos' Wedding Band": {
+    "per": 0.03505928525397462,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Mara's Kaleidoscope": {
+    "per": 0.013597760168597635,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Highlord's Wrath": {
+    "per": 0.013597760168597635,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Any unique ring": {
+    "per": 0.2909920676079894,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Any unique amulet": {
+    "per": 0.1454960338039947,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Rainbow Facet": {
+    "per": 0.07274801690199735,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Set ring/amulet": {
+    "per": 0.1364344612039121,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Rings + amulets (all qualities)": {
+    "per": 4.301718325525,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Essence of Suffering": {
+    "per": 0.17562724014336917,
+    "unit": "boss kill",
+    "src": "Andarielq (H)"
+   },
+   "Essence of Hatred": {
+    "per": 0.09859154929577466,
+    "unit": "boss kill",
+    "src": "Mephistoq (H) SP"
+   },
+   "Essence of Terror": {
+    "per": 0.09859154929577466,
+    "unit": "boss kill",
+    "src": "Diabloq (H) SP"
+   },
+   "Essence of Destruction": {
+    "per": 0.09859154929577466,
+    "unit": "boss kill",
+    "src": "Baalq (H) SP"
+   },
+   "_rune_floor_fails": 0
+  },
+  "sp": {
+   "Key of Terror": {
+    "per": 0.29411764705882354,
+    "unit": "boss kill",
+    "src": "Countess (H)"
+   },
+   "Key of Hate": {
+    "per": 0.3571428571428571,
+    "unit": "boss kill",
+    "src": "Summoner (H)"
+   },
+   "Key of Destruction": {
+    "per": 0.3278688524590164,
+    "unit": "boss kill",
+    "src": "Nihlathak (H)"
+   },
+   "Talic's Anguish (Act 1)": {
+    "per": 0.13548387096774195,
+    "unit": "boss kill",
+    "src": "Andarielq (H)"
+   },
+   "Korlic's Pain (Act 2)": {
+    "per": 0.34806629834254144,
+    "unit": "boss kill",
+    "src": "Durielq (H) SP"
+   },
+   "Madawc's Ire (Act 3)": {
+    "per": 0.10800000000000001,
+    "unit": "boss kill",
+    "src": "Mephistoq (H) SP"
+   },
+   "Bul-Kathos' Nightmare (Act 4)": {
+    "per": 0.10800000000000001,
+    "unit": "boss kill",
+    "src": "Diabloq (H) SP"
+   },
+   "Worusk's End (Act 5)": {
+    "per": 0.10800000000000001,
+    "unit": "boss kill",
+    "src": "Baalq (H) SP"
+   },
+   "Latent Sunder Charm (any)": {
+    "per": 0.08497440146155971,
+    "unit": "Herald kill",
+    "src": "Act 5 (H) Herald A"
+   },
+   "Black Cleft (rarest Sunder)": {
+    "per": 0.014162400243593285,
+    "unit": "Herald kill",
+    "src": "Act 5 (H) Herald A"
+   },
+   "The Stone of Jordan": {
+    "per": 0.09297065516230936,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Bul-Kathos' Wedding Band": {
+    "per": 0.09297065516230936,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Mara's Kaleidoscope": {
+    "per": 0.03605871204893307,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Highlord's Wrath": {
+    "per": 0.03605871204893307,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Any unique ring": {
+    "per": 0.7716564378471678,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Any unique amulet": {
+    "per": 0.3858282189235839,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Rainbow Facet": {
+    "per": 0.19291410946179194,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Set ring/amulet": {
+    "per": 0.5027221073599235,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Rings + amulets (all qualities)": {
+    "per": 8.555794361144475,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Essence of Suffering": {
+    "per": 0.35125448028673834,
+    "unit": "boss kill",
+    "src": "Andarielq (H)"
+   },
+   "Essence of Hatred": {
+    "per": 0.1971830985915493,
+    "unit": "boss kill",
+    "src": "Mephistoq (H) SP"
+   },
+   "Essence of Terror": {
+    "per": 0.1971830985915493,
+    "unit": "boss kill",
+    "src": "Diabloq (H) SP"
+   },
+   "Essence of Destruction": {
+    "per": 0.1971830985915493,
+    "unit": "boss kill",
+    "src": "Baalq (H) SP"
+   },
+   "_rune_floor_fails": 0
+  },
+  "generous": {
+   "Key of Terror": {
+    "per": 0.5882352941176471,
+    "unit": "boss kill",
+    "src": "Countess (H)"
+   },
+   "Key of Hate": {
+    "per": 0.7142857142857142,
+    "unit": "boss kill",
+    "src": "Summoner (H)"
+   },
+   "Key of Destruction": {
+    "per": 0.6557377049180328,
+    "unit": "boss kill",
+    "src": "Nihlathak (H)"
+   },
+   "Talic's Anguish (Act 1)": {
+    "per": 0.22580645161290322,
+    "unit": "boss kill",
+    "src": "Andarielq (H)"
+   },
+   "Korlic's Pain (Act 2)": {
+    "per": 0.580110497237569,
+    "unit": "boss kill",
+    "src": "Durielq (H) SP"
+   },
+   "Madawc's Ire (Act 3)": {
+    "per": 0.18,
+    "unit": "boss kill",
+    "src": "Mephistoq (H) SP"
+   },
+   "Bul-Kathos' Nightmare (Act 4)": {
+    "per": 0.18,
+    "unit": "boss kill",
+    "src": "Diabloq (H) SP"
+   },
+   "Worusk's End (Act 5)": {
+    "per": 0.18,
+    "unit": "boss kill",
+    "src": "Baalq (H) SP"
+   },
+   "Latent Sunder Charm (any)": {
+    "per": 0.16254876462938883,
+    "unit": "Herald kill",
+    "src": "Act 5 (H) Herald A"
+   },
+   "Black Cleft (rarest Sunder)": {
+    "per": 0.027091460771564803,
+    "unit": "Herald kill",
+    "src": "Act 5 (H) Herald A"
+   },
+   "The Stone of Jordan": {
+    "per": 0.2080839180133841,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Bul-Kathos' Wedding Band": {
+    "per": 0.2080839180133841,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Mara's Kaleidoscope": {
+    "per": 0.08070544483696675,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Highlord's Wrath": {
+    "per": 0.08070544483696675,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Any unique ring": {
+    "per": 1.7270965195110883,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Any unique amulet": {
+    "per": 0.8635482597555442,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Rainbow Facet": {
+    "per": 0.4317741298777721,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Set ring/amulet": {
+    "per": 1.3828838098661755,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Rings + amulets (all qualities)": {
+    "per": 12.766599275061743,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Essence of Suffering": {
+    "per": 0.5268817204301075,
+    "unit": "boss kill",
+    "src": "Andarielq (H)"
+   },
+   "Essence of Hatred": {
+    "per": 0.29577464788732394,
+    "unit": "boss kill",
+    "src": "Mephistoq (H) SP"
+   },
+   "Essence of Terror": {
+    "per": 0.29577464788732394,
+    "unit": "boss kill",
+    "src": "Diabloq (H) SP"
+   },
+   "Essence of Destruction": {
+    "per": 0.29577464788732394,
+    "unit": "boss kill",
+    "src": "Baalq (H) SP"
+   },
+   "_rune_floor_fails": 0
+  },
+  "vanilla": {
+   "Key of Terror": {
+    "per": 0.07352941176470588,
+    "unit": "boss kill",
+    "src": "Countess (H)"
+   },
+   "Key of Hate": {
+    "per": 0.08928571428571427,
+    "unit": "boss kill",
+    "src": "Summoner (H)"
+   },
+   "Key of Destruction": {
+    "per": 0.0819672131147541,
+    "unit": "boss kill",
+    "src": "Nihlathak (H)"
+   },
+   "Talic's Anguish (Act 1)": {
+    "per": 0.04516129032258064,
+    "unit": "boss kill",
+    "src": "Andarielq (H)"
+   },
+   "Korlic's Pain (Act 2)": {
+    "per": 0.1160220994475138,
+    "unit": "boss kill",
+    "src": "Duriel (H)"
+   },
+   "Madawc's Ire (Act 3)": {
+    "per": 0.036,
+    "unit": "boss kill",
+    "src": "Mephisto (H)"
+   },
+   "Bul-Kathos' Nightmare (Act 4)": {
+    "per": 0.036,
+    "unit": "boss kill",
+    "src": "Diablo (H)"
+   },
+   "Worusk's End (Act 5)": {
+    "per": 0.036,
+    "unit": "boss kill",
+    "src": "Baal (H)"
+   },
+   "Latent Sunder Charm (any)": {
+    "per": 0.022158209616662972,
+    "unit": "Herald kill",
+    "src": "Act 5 (H) Herald A"
+   },
+   "Black Cleft (rarest Sunder)": {
+    "per": 0.0006581646420790982,
+    "unit": "Herald kill",
+    "src": "Act 5 (H) Herald A"
+   },
+   "The Stone of Jordan": {
+    "per": 0.00029396111352205897,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Bul-Kathos' Wedding Band": {
+    "per": 0.00029396111352205897,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Mara's Kaleidoscope": {
+    "per": 0.0005898561817383419,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Highlord's Wrath": {
+    "per": 0.0005898561817383419,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Any unique ring": {
+    "per": 0.017931627924845595,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Any unique amulet": {
+    "per": 0.008965813962422797,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Rainbow Facet": {
+    "per": 0.004482906981211399,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Set ring/amulet": {
+    "per": 0.07133559489515587,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Rings + amulets (all qualities)": {
+    "per": 4.301718325525,
+    "unit": "hour",
+    "src": "Hell lvl-85 farming"
+   },
+   "Essence of Suffering": {
+    "per": 0.17562724014336917,
+    "unit": "boss kill",
+    "src": "Andarielq (H)"
+   },
+   "Essence of Hatred": {
+    "per": 0.12000000000000001,
+    "unit": "boss kill",
+    "src": "Mephisto (H)"
+   },
+   "Essence of Terror": {
+    "per": 0.12000000000000001,
+    "unit": "boss kill",
+    "src": "Diablo (H)"
+   },
+   "Essence of Destruction": {
+    "per": 0.12000000000000001,
+    "unit": "boss kill",
+    "src": "Baal (H)"
+   },
+   "_rune_floor_fails": 0
+  }
+ },
+ "params": {
+  "mild": {
+   "uber_keys_mult": 2,
+   "ancient_statue_mult": 2,
+   "sunder_mult": 2,
+   "sunder_even_types": false,
+   "essence_mult": 1,
+   "jewelry_mult": 1,
+   "jewelry_unique_mod": 992,
+   "jewelry_set_mod": 768,
+   "chase_jewelry_rarity": true
+  },
+  "sp": {
+   "uber_keys_mult": 4,
+   "ancient_statue_mult": 3,
+   "sunder_mult": 4,
+   "sunder_even_types": true,
+   "essence_mult": 2,
+   "jewelry_mult": 2,
+   "jewelry_unique_mod": 1000,
+   "jewelry_set_mod": 896,
+   "chase_jewelry_rarity": true
+  },
+  "generous": {
+   "uber_keys_mult": 8,
+   "ancient_statue_mult": 5,
+   "sunder_mult": 8,
+   "sunder_even_types": true,
+   "essence_mult": 3,
+   "jewelry_mult": 3,
+   "jewelry_unique_mod": 1008,
+   "jewelry_set_mod": 960,
+   "chase_jewelry_rarity": true
+  }
+ },
+ "rarity": {
+  "The Stone of Jordan": 10,
+  "Bul Katho's Wedding Band": 10,
+  "Wisp": 5,
+  "Mara's Kaleidoscope": 10,
+  "Highlord's Wrath": 10,
+  "The Cat's Eye": 10,
+  "Atma's Scarab": 10,
+  "Metalgrid": 8,
+  "Seraph's Hymn": 8
+ }
+}
