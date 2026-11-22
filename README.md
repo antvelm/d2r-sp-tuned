@@ -14,6 +14,8 @@
 
 **Loot design with all the numbers:** [docs/loot-proposal.html](docs/loot-proposal.html).
 
+**Every boosted unique, vanilla vs modded hours per preset:** [docs/uniques-proposal.html](docs/uniques-proposal.html).
+
 ## Quick start
 
 Requirements: Python 3.11+ and a built [CascLib](https://github.com/ladislav-zezula/CascLib):
@@ -113,7 +115,7 @@ Most chase uniques are the only unique on their base, so a rarity weight can't s
 | Griffon's Eye | ~6,600 h | ~22 h |
 | Crown of Ages, Arachnid Mesh, Tomb Reaver, Stormlash (item level 86-87) | 900-8,000 h | ~75 h |
 
-Item level 86-87 uniques need monster level 86+, so in level-85 zones only champions, uniques and bosses roll them (as in vanilla). While levelling, fewer uniques are eligible, so each comes faster: in Nightmare Act 5 Arreat's Face or Bartuc's takes ~9 h instead of 650-860 h. `python tools/uniques.py report` prints the full list.
+Item level 86-87 uniques need monster level 86+, so in level-85 zones only champions, uniques and bosses roll them (as in vanilla). While levelling, fewer uniques are eligible, so each comes faster: in Nightmare Act 5 Arreat's Face or Bartuc's takes ~9 h instead of 650-860 h. The full list is in [docs/uniques-proposal.html](docs/uniques-proposal.html); `python tools/uniques.py report` prints it too.
 
 **Mercs** (`hireling.txt`)
 Revive price = multiplier ÷ divisor scaling, capped at max. Setting divisor 2 → 10 and max 50,000 → 10,000 makes every revive one fifth of vanilla. Automatic revival isn't something these data tables can express.
@@ -136,5 +138,6 @@ Both table sets the game ships are written: `excel/` (with the 3.x expansion) an
 | `tools/casc_extract.py` | Pulls files out of the game's CASC storage through CascLib |
 | `tools/make_page.py` | Regenerates `docs/rune-proposal.html` (standalone) and `docs/index.html` (artifact version) |
 | `tools/make_loot_page.py` | Regenerates `docs/loot-proposal.html` and `docs/loot-index.html` |
+| `tools/make_uniques_page.py` | Regenerates `docs/uniques-proposal.html` and `docs/uniques-index.html` |
 
 Blizzard's game files are deliberately not in this repo (`reference/` is git-ignored). Everything is generated from your own install.

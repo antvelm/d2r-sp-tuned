@@ -1,0 +1,158 @@
+<title>SPTuned Uniques</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: narrow header + preset/filters bar, one full-width ledger table that scrolls sideways on phones */
+:root{
+  --bg:#f3f4f6; --panel:#ffffff; --fg:#1c1f26; --muted:#5d6472; --line:#d9dce3;
+  --gold:#8a6d2b; --gold-soft:#efe6cf; --set:#2f7a3a; --van:#a3473a; --bar:#c9b27a;
+  --display:"Cinzel",Georgia,serif; --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121317; --panel:#1a1c22; --fg:#e7e4dc; --muted:#9aa0ab; --line:#2c2f37;
+  --gold:#c7ab6b; --gold-soft:#2b2618; --set:#6cc27a; --van:#e0897b; --bar:#7c6a3f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121317; --panel:#1a1c22; --fg:#e7e4dc; --muted:#9aa0ab; --line:#2c2f37;
+  --gold:#c7ab6b; --gold-soft:#2b2618; --set:#6cc27a; --van:#e0897b; --bar:#7c6a3f; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-block:32px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:24px}
+h1{font-family:var(--display);color:var(--gold);font-size:2rem;margin:0;letter-spacing:.02em;text-wrap:balance}
+h2{font-family:var(--display);font-size:1.05rem;margin:0 0 8px;color:var(--fg);letter-spacing:.03em}
+.lede{max-width:68ch;color:var(--muted);margin:6px 0 0}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.fact{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+.fact b{display:block;font-family:var(--mono);font-size:1.25rem;color:var(--gold);font-variant-numeric:tabular-nums}
+.fact span{color:var(--muted);font-size:.85rem}
+.bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
+.seg button,.chip{font:inherit;font-size:.85rem;border:0;background:transparent;color:var(--fg);padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--gold);color:var(--panel);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);border-radius:999px;background:var(--panel)}
+.chip[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft);color:var(--fg)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+#q{font:inherit;font-size:.9rem;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--fg);min-width:0;width:220px;max-width:100%}
+.tablebox{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:6px}
+table{border-collapse:collapse;width:100%;min-width:860px;font-size:.88rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;cursor:pointer;user-select:none;white-space:nowrap;position:sticky;top:0;background:var(--panel)}
+th[aria-sort="ascending"]::after{content:" ▲"} th[aria-sort="descending"]::after{content:" ▼"}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.name{color:var(--gold);font-weight:600}
+td.base{color:var(--muted)}
+.cat{font-size:.75rem;color:var(--muted);white-space:nowrap}
+.van{color:var(--van)}
+.mod{font-weight:600}
+.na{color:var(--muted);font-family:var(--body);font-size:.8rem}
+.spark{width:150px}
+.spark svg{display:block;width:150px;height:14px}
+tr:last-child td{border-bottom:0}
+.notes{display:grid;gap:10px;max-width:78ch}
+.notes p{margin:0}
+.notes code{font-family:var(--mono);font-size:.85em;background:var(--gold-soft);padding:1px 4px;border-radius:3px}
+.foot{color:var(--muted);font-size:.82rem}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="lbl">SPTuned · Uniques part · treasureclassex.txt</div>
+    <h1>SPTuned Uniques</h1>
+    <p class="lede">Every unique the mod boosts, with the expected hours to find one without Magic Find, vanilla against modded. Hell column: lvl-85 areas at 900 normal, 80 champion and 20 unique kills an hour. Nightmare column: Act 5 Nightmare (lvl 62) at the same pace.</p>
+  </header>
+
+  <section class="facts" id="facts"></section>
+
+  <section class="bar" aria-label="Controls">
+    <div><div class="lbl">Preset</div>
+      <div class="seg" id="presets">
+        <button type="button" id="p-mild" data-p="mild" aria-pressed="false">mild · 60 h</button>
+        <button type="button" id="p-sp" data-p="sp" aria-pressed="true">sp · 25 h</button>
+        <button type="button" id="p-generous" data-p="generous" aria-pressed="false">generous · 10 h</button>
+      </div></div>
+    <div style="min-width:0"><div class="lbl">Slot</div><div class="chips" id="chips"></div></div>
+    <div><div class="lbl"><label for="q">Search</label></div><input id="q" type="search" placeholder="Arreat, Shako, claw…" autocomplete="off"></div>
+  </section>
+
+  <div class="tablebox">
+    <table id="t">
+      <thead><tr>
+        <th data-k="name">Unique</th><th data-k="base">Base</th><th data-k="cat">Slot</th>
+        <th class="num" data-k="ilvl" title="Unique item level: lowest monster level that can roll it">ilvl</th>
+        <th class="num" data-k="req">Req</th>
+        <th class="num" data-k="vh">Hell vanilla</th><th class="num" data-k="mh" aria-sort="ascending">Hell modded</th>
+        <th class="num" data-k="x">Faster</th>
+        <th data-k="x2" title="Log scale 1 h to 10,000 h: red tick vanilla, gold bar modded">1 h → 10,000 h</th>
+        <th class="num" data-k="vn">NM vanilla</th><th class="num" data-k="mn">NM modded</th>
+      </tr></thead>
+      <tbody id="tb"></tbody>
+    </table>
+  </div>
+  <p class="foot" id="count"></p>
+
+  <section class="notes">
+    <h2>What changes in the game files</h2>
+    <p><b>New tables.</b> <span data-m="chase_tables">33</span> <code>SP Chase uL</code> treasure classes, chained by unique item level 20 → 87. Each lists the base items of the uniques up to that level with the Unique quality modifier at 1024, so a pick is always the unique.</p>
+    <p><b>One extra entry in <span data-m="drop_tables">406</span> drop tables</b> (<span data-m="drop_tables_base">402</span> in <code>excel/base</code>): normal, champion, unique, boss, quest-boss and terror-zone tables in all three difficulties. Each gets the chase table for its monster level. The weight is about 2% of the table's equipment weight, so bosses and champions roll it more often. A Hell Baal kill drops one about 1 time in <span data-m="baal_one_in">9</span>.</p>
+    <p><b>Nothing else drops less from normal monsters or bosses.</b> The weight comes out of NoDrop. Champion and unique-monster item tables have no NoDrop, so there it comes out of their equipment entry: about 2% fewer of their regular items. The rune floor check still passes.</p>
+    <p><b>Shared bases.</b> Nightwing's Veil (with Veil of Steel), Heaven's Light (with The Redeemer) and Stormlash (with Horizon's Tornado) get a bigger weight, so the listed unique still hits the target and the sibling gets the rest. Templar's Might also rolls Tyrael's Might at its normal 1-in-9 share.</p>
+    <p><b>Item level 86–87</b> (Crown of Ages, Arachnid Mesh, Tomb Reaver, Stormlash) need monster level 86+, so in level-85 areas only champions, unique monsters and bosses roll them, as in vanilla.</p>
+    <p><b>Nightmare.</b> Fewer uniques are eligible at lower levels, so each one comes faster. A dash means the unique's item level is above what Act 5 Nightmare monsters roll.</p>
+    <p class="foot">Not changed: <code>uniqueitems.txt</code>, <code>itemratio.txt</code>, weapons and armor tables. Change the list with <code>exclude</code> / <code>extra</code> in the <code>[uniques]</code> section of settings.toml; <code>python tools/uniques.py report</code> recomputes the Hell column.</p>
+  </section>
+</div>
+
+<script>
+const D = __DATA__;
+const META = __META__;
+const CATS = [...new Set(D.map(r => r.cat))];
+document.querySelectorAll("[data-m]").forEach(e => { e.textContent = META[e.dataset.m]; });
+let preset = "sp", cat = null, sortK = "mh", sortDir = 1;
+const fmt = h => h == null ? null : h >= 100 ? Math.round(h).toLocaleString("en-US") : h >= 10 ? h.toFixed(0) : h.toFixed(1);
+const cell = (h, cls) => h == null ? '<td class="num"><span class="na">—</span></td>' : `<td class="num ${cls||""}">${fmt(h)} h</td>`;
+const lx = h => Math.max(0, Math.min(150, Math.log10(Math.max(1, h)) / 4 * 150));
+function spark(v, m){
+  if (v == null || m == null) return "";
+  return `<svg viewBox="0 0 150 14" role="img" aria-label="${fmt(v)} h vanilla, ${fmt(m)} h modded"><rect x="0" y="6" width="150" height="2" fill="var(--line)"/><rect x="0" y="3" width="${lx(m).toFixed(1)}" height="8" rx="2" fill="var(--bar)"/><rect x="${(lx(v)-1).toFixed(1)}" y="1" width="2" height="12" fill="var(--van)"/></svg>`;
+}
+function rows(){
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  return D.map(r => ({...r, mh: r[preset + "_h"], mn: r[preset + "_n"], x: r.vh && r[preset + "_h"] ? r.vh / r[preset + "_h"] : 0, x2: r[preset + "_h"]}))
+    .filter(r => (!cat || r.cat === cat) && (!q || (r.name + " " + r.base + " " + r.cat).toLowerCase().includes(q)))
+    .sort((a, b) => { const A = a[sortK], B = b[sortK];
+      if (A == null) return 1; if (B == null) return -1;
+      return (typeof A === "string" ? A.localeCompare(B) : A - B) * sortDir; });
+}
+function render(){
+  const R = rows();
+  document.getElementById("tb").innerHTML = R.map(r => `<tr>
+    <td class="name">${r.name}</td><td class="base">${r.base}</td><td class="cat">${r.cat}</td>
+    <td class="num">${r.ilvl}</td><td class="num">${r.req}</td>
+    ${cell(r.vh, "van")}${cell(r.mh, "mod")}
+    <td class="num">${r.x ? "×" + Math.round(r.x) : ""}</td>
+    <td class="spark">${spark(r.vh, r.mh)}</td>
+    ${cell(r.vn, "van")}${cell(r.mn, "mod")}</tr>`).join("");
+  document.getElementById("count").textContent = `${R.length} of ${D.length} uniques shown · preset ${preset}`;
+  const all = D.map(r => r[preset + "_h"]).filter(Boolean).sort((a,b)=>a-b);
+  const med = all[Math.floor(all.length/2)];
+  const perH = D.reduce((s, r) => s + (r[preset + "_h"] ? 1 / r[preset + "_h"] : 0), 0);
+  const vMed = D.map(r => r.vh).sort((a,b)=>a-b)[Math.floor(D.length/2)];
+  document.getElementById("facts").innerHTML = [
+    [D.length, `uniques boosted (${D.filter(r => r.cat === "Class · req 42").length} of them the req-42 class uniques)`],
+    [`${fmt(vMed)} h → ${fmt(med)} h`, "median hours per unique in Hell, vanilla → " + preset],
+    [perH.toFixed(1) + " / h", "listed uniques per Hell hour, all together"],
+    [META.drop_tables, `drop tables get one chase entry; ${META.chase_tables} new chase tables`],
+  ].map(([b, s]) => `<div class="fact"><b>${b}</b><span>${s}</span></div>`).join("");
+  document.querySelectorAll("th").forEach(th => th.setAttribute("aria-sort", th.dataset.k === sortK ? (sortDir > 0 ? "ascending" : "descending") : "none"));
+}
+document.getElementById("chips").innerHTML = ["All", ...CATS].map((c, i) => `<button type="button" class="chip" id="c-${i}" data-c="${i ? c : ""}" aria-pressed="${i ? "false" : "true"}">${c}</button>`).join("");
+document.getElementById("chips").addEventListener("click", e => { const b = e.target.closest(".chip"); if (!b) return;
+  cat = b.dataset.c || null; document.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", x === b)); render(); });
+document.getElementById("presets").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+  preset = b.dataset.p; document.querySelectorAll("#presets button").forEach(x => x.setAttribute("aria-pressed", x === b)); render(); });
+document.querySelector("thead").addEventListener("click", e => { const th = e.target.closest("th"); if (!th) return;
+  const k = th.dataset.k; if (k === sortK) sortDir = -sortDir; else { sortK = k; sortDir = (k === "x") ? -1 : 1; } render(); });
+document.getElementById("q").addEventListener("input", render);
+render();
+</script>

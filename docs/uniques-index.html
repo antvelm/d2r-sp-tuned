@@ -1,0 +1,158 @@
+<title>SPTuned Uniques</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: narrow header + preset/filters bar, one full-width ledger table that scrolls sideways on phones */
+:root{
+  --bg:#f3f4f6; --panel:#ffffff; --fg:#1c1f26; --muted:#5d6472; --line:#d9dce3;
+  --gold:#8a6d2b; --gold-soft:#efe6cf; --set:#2f7a3a; --van:#a3473a; --bar:#c9b27a;
+  --display:"Cinzel",Georgia,serif; --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121317; --panel:#1a1c22; --fg:#e7e4dc; --muted:#9aa0ab; --line:#2c2f37;
+  --gold:#c7ab6b; --gold-soft:#2b2618; --set:#6cc27a; --van:#e0897b; --bar:#7c6a3f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121317; --panel:#1a1c22; --fg:#e7e4dc; --muted:#9aa0ab; --line:#2c2f37;
+  --gold:#c7ab6b; --gold-soft:#2b2618; --set:#6cc27a; --van:#e0897b; --bar:#7c6a3f; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-block:32px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:24px}
+h1{font-family:var(--display);color:var(--gold);font-size:2rem;margin:0;letter-spacing:.02em;text-wrap:balance}
+h2{font-family:var(--display);font-size:1.05rem;margin:0 0 8px;color:var(--fg);letter-spacing:.03em}
+.lede{max-width:68ch;color:var(--muted);margin:6px 0 0}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.fact{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+.fact b{display:block;font-family:var(--mono);font-size:1.25rem;color:var(--gold);font-variant-numeric:tabular-nums}
+.fact span{color:var(--muted);font-size:.85rem}
+.bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
+.seg button,.chip{font:inherit;font-size:.85rem;border:0;background:transparent;color:var(--fg);padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--gold);color:var(--panel);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);border-radius:999px;background:var(--panel)}
+.chip[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft);color:var(--fg)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+#q{font:inherit;font-size:.9rem;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--fg);min-width:0;width:220px;max-width:100%}
+.tablebox{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:6px}
+table{border-collapse:collapse;width:100%;min-width:860px;font-size:.88rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;cursor:pointer;user-select:none;white-space:nowrap;position:sticky;top:0;background:var(--panel)}
+th[aria-sort="ascending"]::after{content:" ▲"} th[aria-sort="descending"]::after{content:" ▼"}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.name{color:var(--gold);font-weight:600}
+td.base{color:var(--muted)}
+.cat{font-size:.75rem;color:var(--muted);white-space:nowrap}
+.van{color:var(--van)}
+.mod{font-weight:600}
+.na{color:var(--muted);font-family:var(--body);font-size:.8rem}
+.spark{width:150px}
+.spark svg{display:block;width:150px;height:14px}
+tr:last-child td{border-bottom:0}
+.notes{display:grid;gap:10px;max-width:78ch}
+.notes p{margin:0}
+.notes code{font-family:var(--mono);font-size:.85em;background:var(--gold-soft);padding:1px 4px;border-radius:3px}
+.foot{color:var(--muted);font-size:.82rem}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="lbl">SPTuned · Uniques part · treasureclassex.txt</div>
+    <h1>SPTuned Uniques</h1>
+    <p class="lede">Every unique the mod boosts, with the expected hours to find one without Magic Find, vanilla against modded. Hell column: lvl-85 areas at 900 normal, 80 champion and 20 unique kills an hour. Nightmare column: Act 5 Nightmare (lvl 62) at the same pace.</p>
+  </header>
+
+  <section class="facts" id="facts"></section>
+
+  <section class="bar" aria-label="Controls">
+    <div><div class="lbl">Preset</div>
+      <div class="seg" id="presets">
+        <button type="button" id="p-mild" data-p="mild" aria-pressed="false">mild · 60 h</button>
+        <button type="button" id="p-sp" data-p="sp" aria-pressed="true">sp · 25 h</button>
+        <button type="button" id="p-generous" data-p="generous" aria-pressed="false">generous · 10 h</button>
+      </div></div>
+    <div style="min-width:0"><div class="lbl">Slot</div><div class="chips" id="chips"></div></div>
+    <div><div class="lbl"><label for="q">Search</label></div><input id="q" type="search" placeholder="Arreat, Shako, claw…" autocomplete="off"></div>
+  </section>
+
+  <div class="tablebox">
+    <table id="t">
+      <thead><tr>
+        <th data-k="name">Unique</th><th data-k="base">Base</th><th data-k="cat">Slot</th>
+        <th class="num" data-k="ilvl" title="Unique item level: lowest monster level that can roll it">ilvl</th>
+        <th class="num" data-k="req">Req</th>
+        <th class="num" data-k="vh">Hell vanilla</th><th class="num" data-k="mh" aria-sort="ascending">Hell modded</th>
+        <th class="num" data-k="x">Faster</th>
+        <th data-k="x2" title="Log scale 1 h to 10,000 h: red tick vanilla, gold bar modded">1 h → 10,000 h</th>
+        <th class="num" data-k="vn">NM vanilla</th><th class="num" data-k="mn">NM modded</th>
+      </tr></thead>
+      <tbody id="tb"></tbody>
+    </table>
+  </div>
+  <p class="foot" id="count"></p>
+
+  <section class="notes">
+    <h2>What changes in the game files</h2>
+    <p><b>New tables.</b> <span data-m="chase_tables">33</span> <code>SP Chase uL</code> treasure classes, chained by unique item level 20 → 87. Each lists the base items of the uniques up to that level with the Unique quality modifier at 1024, so a pick is always the unique.</p>
+    <p><b>One extra entry in <span data-m="drop_tables">406</span> drop tables</b> (<span data-m="drop_tables_base">402</span> in <code>excel/base</code>): normal, champion, unique, boss, quest-boss and terror-zone tables in all three difficulties. Each gets the chase table for its monster level. The weight is about 2% of the table's equipment weight, so bosses and champions roll it more often. A Hell Baal kill drops one about 1 time in <span data-m="baal_one_in">9</span>.</p>
+    <p><b>Nothing else drops less from normal monsters or bosses.</b> The weight comes out of NoDrop. Champion and unique-monster item tables have no NoDrop, so there it comes out of their equipment entry: about 2% fewer of their regular items. The rune floor check still passes.</p>
+    <p><b>Shared bases.</b> Nightwing's Veil (with Veil of Steel), Heaven's Light (with The Redeemer) and Stormlash (with Horizon's Tornado) get a bigger weight, so the listed unique still hits the target and the sibling gets the rest. Templar's Might also rolls Tyrael's Might at its normal 1-in-9 share.</p>
+    <p><b>Item level 86–87</b> (Crown of Ages, Arachnid Mesh, Tomb Reaver, Stormlash) need monster level 86+, so in level-85 areas only champions, unique monsters and bosses roll them, as in vanilla.</p>
+    <p><b>Nightmare.</b> Fewer uniques are eligible at lower levels, so each one comes faster. A dash means the unique's item level is above what Act 5 Nightmare monsters roll.</p>
+    <p class="foot">Not changed: <code>uniqueitems.txt</code>, <code>itemratio.txt</code>, weapons and armor tables. Change the list with <code>exclude</code> / <code>extra</code> in the <code>[uniques]</code> section of settings.toml; <code>python tools/uniques.py report</code> recomputes the Hell column.</p>
+  </section>
+</div>
+
+<script>
+const D = [{"name":"Bartuc's Cut-Throat","index":"Cutthroat1","base":"Greater Talons","code":"9tw","cat":"Class \u00b7 req 42","ilvl":50,"req":42,"vh":877.4,"vn":644.3,"mild_h":51.5,"mild_n":20.7,"sp_h":22.1,"sp_n":8.8,"generous_h":9.0,"generous_n":3.6},{"name":"Titan's Revenge","index":"Titan's Revenge","base":"Ceremonial Javelin","code":"ama","cat":"Class \u00b7 req 42","ilvl":50,"req":42,"vh":316.7,"vn":232.7,"mild_h":46.7,"mild_n":19.6,"sp_h":21.1,"sp_n":8.6,"generous_h":8.9,"generous_n":3.5},{"name":"Lycander's Aim","index":"Lycander's Aim","base":"Ceremonial Bow","code":"am7","cat":"Class \u00b7 req 42","ilvl":50,"req":42,"vh":562.8,"vn":413.4,"mild_h":49.9,"mild_n":20.3,"sp_h":21.8,"sp_n":8.7,"generous_h":9.0,"generous_n":3.5},{"name":"Lycander's Flank","index":"Lycander's Flank","base":"Ceremonial Pike","code":"am9","cat":"Class \u00b7 req 42","ilvl":50,"req":42,"vh":584.9,"vn":430.6,"mild_h":50.1,"mild_n":20.4,"sp_h":21.8,"sp_n":8.7,"generous_h":9.0,"generous_n":3.5},{"name":"Arreat's Face","index":"Arreat's Face","base":"Slayer Guard","code":"baa","cat":"Class \u00b7 req 42","ilvl":50,"req":42,"vh":1114.2,"vn":863.3,"mild_h":52.2,"mild_n":20.9,"sp_h":22.2,"sp_n":8.8,"generous_h":9.0,"generous_n":3.6},{"name":"Jalal's Mane","index":"Jalal's Mane","base":"Totemic Mask","code":"dra","cat":"Class \u00b7 req 42","ilvl":50,"req":42,"vh":1252.5,"vn":1118.2,"mild_h":52.4,"mild_n":21.0,"sp_h":22.2,"sp_n":8.8,"generous_h":9.1,"generous_n":3.6},{"name":"Homunculus","index":"Homunculus","base":"Heirophant Trophy","code":"nea","cat":"Class \u00b7 req 42","ilvl":50,"req":42,"vh":2228.3,"vn":1726.6,"mild_h":53.4,"mild_n":21.1,"sp_h":22.4,"sp_n":8.8,"generous_h":9.1,"generous_n":3.6},{"name":"Herald of Zakarum","index":"Herald of Zakarum","base":"Gilded Shield","code":"pa9","cat":"Class \u00b7 req 42","ilvl":50,"req":42,"vh":1542.1,"vn":1135.1,"mild_h":52.9,"mild_n":21.0,"sp_h":22.3,"sp_n":8.8,"generous_h":9.1,"generous_n":3.6},{"name":"The Oculus","index":"The Oculus","base":"Swirling Crystal","code":"oba","cat":"Class \u00b7 req 42","ilvl":50,"req":42,"vh":351.0,"vn":257.7,"mild_h":47.4,"mild_n":19.8,"sp_h":21.3,"sp_n":8.6,"generous_h":8.9,"generous_n":3.5},{"name":"Jade Talon","index":"Jadetalon","base":"Wrist Sword","code":"7wb","cat":"Class \u00b7 elite","ilvl":74,"req":66,"vh":618.2,"vn":null,"mild_h":50.3,"mild_n":null,"sp_h":21.8,"sp_n":null,"generous_h":9.0,"generous_n":null},{"name":"Spirit Keeper","index":"Spiritkeeper","base":"Earth Spirit","code":"drd","cat":"Class \u00b7 elite","ilvl":75,"req":67,"vh":2542.0,"vn":null,"mild_h":53.6,"mild_n":null,"sp_h":22.4,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Ravenlore","index":"Ravenlore","base":"Sky Spirit","code":"dre","cat":"Class \u00b7 elite","ilvl":82,"req":74,"vh":2796.8,"vn":null,"mild_h":53.7,"mild_n":null,"sp_h":22.5,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Eschuta's Temper","index":"Eschuta's temper","base":"Eldritch Orb","code":"obc","cat":"Class \u00b7 elite","ilvl":80,"req":72,"vh":287.9,"vn":null,"mild_h":46.0,"mild_n":null,"sp_h":21.0,"sp_n":null,"generous_h":8.8,"generous_n":null},{"name":"Death's Fathom","index":"Fathom","base":"Dimensional Shard","code":"obf","cat":"Class \u00b7 elite","ilvl":81,"req":73,"vh":759.9,"vn":null,"mild_h":51.1,"mild_n":null,"sp_h":22.0,"sp_n":null,"generous_h":9.0,"generous_n":null},{"name":"Thunderstroke","index":"Thunderstroke","base":"Matriarchal Javelin","code":"amf","cat":"Class \u00b7 elite","ilvl":77,"req":69,"vh":344.7,"vn":null,"mild_h":47.3,"mild_n":null,"sp_h":21.3,"sp_n":null,"generous_h":8.9,"generous_n":null},{"name":"Alma Negra","index":"Alma Negra","base":"Sacred Rondache","code":"pac","cat":"Class \u00b7 elite","ilvl":85,"req":77,"vh":804.5,"vn":null,"mild_h":51.3,"mild_n":null,"sp_h":22.0,"sp_n":null,"generous_h":9.0,"generous_n":null},{"name":"Harlequin Crest (Shako)","index":"Harlequin Crest","base":"Shako","code":"uap","cat":"Helm","ilvl":69,"req":62,"vh":1923.7,"vn":null,"mild_h":53.2,"mild_n":null,"sp_h":22.4,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Vampire Gaze","index":"Vampiregaze","base":"Grim Helm","code":"xh9","cat":"Helm","ilvl":49,"req":41,"vh":2454.1,"vn":1855.8,"mild_h":53.5,"mild_n":21.1,"sp_h":22.4,"sp_n":8.8,"generous_h":9.1,"generous_n":3.6},{"name":"Andariel's Visage","index":"Andariel's Visage","base":"Demonhead","code":"usk","cat":"Helm","ilvl":85,"req":83,"vh":691.8,"vn":null,"mild_h":50.7,"mild_n":null,"sp_h":21.9,"sp_n":null,"generous_h":9.0,"generous_n":null},{"name":"Crown of Ages","index":"Crown of Ages","base":"Corona","code":"urn","cat":"Helm","ilvl":86,"req":82,"vh":2394.9,"vn":null,"mild_h":173.0,"mild_n":null,"sp_h":75.5,"sp_n":null,"generous_h":30.7,"generous_n":null},{"name":"Nightwing's Veil","index":"Nightwing's Veil","base":"Spired Helm","code":"uhm","cat":"Helm","ilvl":75,"req":67,"vh":1926.1,"vn":null,"mild_h":53.2,"mild_n":null,"sp_h":22.4,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Griffon's Eye","index":"Griffon's Eye","base":"Diadem","code":"ci3","cat":"Helm","ilvl":84,"req":76,"vh":6570.7,"vn":null,"mild_h":54.3,"mild_n":null,"sp_h":22.6,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Kira's Guardian","index":"Kira's Guardian","base":"Tiara","code":"ci2","cat":"Helm","ilvl":85,"req":77,"vh":2628.0,"vn":null,"mild_h":53.6,"mild_n":null,"sp_h":22.4,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Skin of the Vipermagi","index":"Skin of the Vipermagi","base":"Serpentskin Armor","code":"xea","cat":"Body armor","ilvl":37,"req":29,"vh":509.1,"vn":385.9,"mild_h":49.4,"mild_n":20.3,"sp_h":21.7,"sp_n":8.7,"generous_h":9.0,"generous_n":3.5},{"name":"Shaftstop","index":"Shaftstop","base":"Mesh Armor","code":"xhn","cat":"Body armor","ilvl":46,"req":38,"vh":919.3,"vn":695.7,"mild_h":51.7,"mild_n":20.7,"sp_h":22.1,"sp_n":8.8,"generous_h":9.0,"generous_n":3.6},{"name":"Duriel's Shell","index":"Duriel's Shell","base":"Cuirass","code":"xrs","cat":"Body armor","ilvl":49,"req":41,"vh":434.9,"vn":329.1,"mild_h":48.6,"mild_n":20.1,"sp_h":21.5,"sp_n":8.6,"generous_h":8.9,"generous_n":3.5},{"name":"Guardian Angel","index":"Guardian Angel","base":"Templar Coat","code":"xlt","cat":"Body armor","ilvl":53,"req":45,"vh":887.5,"vn":706.3,"mild_h":51.6,"mild_n":20.8,"sp_h":22.1,"sp_n":8.8,"generous_h":9.0,"generous_n":3.6},{"name":"Leviathan","index":"Leviathan","base":"Kraken Shell","code":"uld","cat":"Body armor","ilvl":73,"req":65,"vh":968.0,"vn":null,"mild_h":51.8,"mild_n":null,"sp_h":22.1,"sp_n":null,"generous_h":9.0,"generous_n":null},{"name":"Arkaine's Valor","index":"Arkaine's Valor","base":"Balrog Skin","code":"upl","cat":"Body armor","ilvl":85,"req":85,"vh":1045.2,"vn":null,"mild_h":52.0,"mild_n":null,"sp_h":22.2,"sp_n":null,"generous_h":9.0,"generous_n":null},{"name":"Ormus' Robes","index":"Ormus' Robes","base":"Dusk Shroud","code":"uui","cat":"Body armor","ilvl":83,"req":75,"vh":1956.4,"vn":null,"mild_h":53.2,"mild_n":null,"sp_h":22.4,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Templar's Might / Tyrael's Might","index":"Templar's Might","base":"Sacred Armor","code":"uar","cat":"Body armor","ilvl":82,"req":74,"vh":1778.2,"vn":null,"mild_h":54.8,"mild_n":null,"sp_h":23.1,"sp_n":null,"generous_h":9.4,"generous_n":null},{"name":"Chance Guards","index":"Chance Guards","base":"Chain Gloves","code":"mgl","cat":"Gloves","ilvl":20,"req":15,"vh":621.2,"vn":473.0,"mild_h":50.3,"mild_n":20.5,"sp_h":21.8,"sp_n":8.7,"generous_h":9.0,"generous_n":3.5},{"name":"Magefist","index":"Magefist","base":"Light Gauntlets","code":"tgl","cat":"Gloves","ilvl":31,"req":23,"vh":396.0,"vn":301.1,"mild_h":48.1,"mild_n":20.0,"sp_h":21.4,"sp_n":8.6,"generous_h":8.9,"generous_n":3.5},{"name":"Frostburn","index":"Frostburn","base":"Gauntlets","code":"hgl","cat":"Gloves","ilvl":39,"req":29,"vh":233.5,"vn":177.3,"mild_h":44.4,"mild_n":19.1,"sp_h":20.7,"sp_n":8.5,"generous_h":8.8,"generous_n":3.5},{"name":"Dracul's Grasp","index":"Dracul's Grasp","base":"Vampirebone Gloves","code":"uvg","cat":"Gloves","ilvl":84,"req":76,"vh":2967.3,"vn":null,"mild_h":53.7,"mild_n":null,"sp_h":22.5,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Steelrend","index":"Steelrend","base":"Ogre Gauntlets","code":"uhg","cat":"Gloves","ilvl":78,"req":70,"vh":1642.7,"vn":null,"mild_h":53.0,"mild_n":null,"sp_h":22.3,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"String of Ears","index":"String of Ears","base":"Demonhide Sash","code":"zlb","cat":"Belt","ilvl":37,"req":29,"vh":1018.1,"vn":771.7,"mild_h":51.9,"mild_n":20.8,"sp_h":22.1,"sp_n":8.8,"generous_h":9.0,"generous_n":3.6},{"name":"Snowclash","index":"Snowclash","base":"Battle Belt","code":"ztb","cat":"Belt","ilvl":49,"req":42,"vh":2447.4,"vn":1851.0,"mild_h":53.5,"mild_n":21.1,"sp_h":22.4,"sp_n":8.8,"generous_h":9.1,"generous_n":3.6},{"name":"Thundergod's Vigor","index":"Thudergod's Vigor","base":"War Belt","code":"zhb","cat":"Belt","ilvl":55,"req":47,"vh":1189.8,"vn":946.6,"mild_h":52.3,"mild_n":20.9,"sp_h":22.2,"sp_n":8.8,"generous_h":9.1,"generous_n":3.6},{"name":"Nosferatu's Coil","index":"Nosferatu's Coil","base":"Vampirefang Belt","code":"uvc","cat":"Belt","ilvl":68,"req":51,"vh":2984.1,"vn":null,"mild_h":53.7,"mild_n":null,"sp_h":22.5,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Verdungo's Hearty Cord","index":"Verdugo's Hearty Cord","base":"Mithril Coil","code":"umc","cat":"Belt","ilvl":71,"req":63,"vh":1387.1,"vn":null,"mild_h":52.7,"mild_n":null,"sp_h":22.3,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Arachnid Mesh","index":"Arachnid Mesh","base":"Spiderweb Sash","code":"ulc","cat":"Belt","ilvl":87,"req":80,"vh":4302.6,"vn":null,"mild_h":178.7,"mild_n":null,"sp_h":76.6,"sp_n":null,"generous_h":30.9,"generous_n":null},{"name":"Waterwalk","index":"Waterwalk","base":"Sharkskin Boots","code":"xvb","cat":"Boots","ilvl":40,"req":32,"vh":2301.9,"vn":1743.9,"mild_h":53.5,"mild_n":21.1,"sp_h":22.4,"sp_n":8.8,"generous_h":9.1,"generous_n":3.6},{"name":"Silkweave","index":"Silkweave","base":"Mesh Boots","code":"xmb","cat":"Boots","ilvl":44,"req":36,"vh":1828.3,"vn":1384.1,"mild_h":53.1,"mild_n":21.1,"sp_h":22.4,"sp_n":8.8,"generous_h":9.1,"generous_n":3.6},{"name":"War Traveler","index":"Wartraveler","base":"Battle Boots","code":"xtb","cat":"Boots","ilvl":50,"req":42,"vh":1631.6,"vn":1234.0,"mild_h":53.0,"mild_n":21.0,"sp_h":22.3,"sp_n":8.8,"generous_h":9.1,"generous_n":3.6},{"name":"Gore Rider","index":"Gorerider","base":"War Boots","code":"xhb","cat":"Boots","ilvl":55,"req":47,"vh":892.4,"vn":710.0,"mild_h":51.6,"mild_n":20.8,"sp_h":22.1,"sp_n":8.8,"generous_h":9.0,"generous_n":3.6},{"name":"Sandstorm Trek","index":"Sandstorm Trek","base":"Scarabshell Boots","code":"uvb","cat":"Boots","ilvl":72,"req":64,"vh":1961.6,"vn":null,"mild_h":53.2,"mild_n":null,"sp_h":22.4,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Marrowwalk","index":"Marrowwalk","base":"Boneweave Boots","code":"umb","cat":"Boots","ilvl":74,"req":66,"vh":1320.9,"vn":null,"mild_h":52.6,"mild_n":null,"sp_h":22.3,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Lidless Wall","index":"Lidless Wall","base":"Grim Shield","code":"xsh","cat":"Shield","ilvl":49,"req":41,"vh":872.3,"vn":659.8,"mild_h":51.5,"mild_n":20.7,"sp_h":22.1,"sp_n":8.8,"generous_h":9.0,"generous_n":3.6},{"name":"Stormshield","index":"Stormshield","base":"Monarch","code":"uit","cat":"Shield","ilvl":77,"req":73,"vh":660.4,"vn":null,"mild_h":50.6,"mild_n":null,"sp_h":21.9,"sp_n":null,"generous_h":9.0,"generous_n":null},{"name":"Buriza-Do Kyanon","index":"Buriza-Do Kyanon","base":"Ballista","code":"8hx","cat":"Weapon","ilvl":59,"req":41,"vh":1338.3,"vn":1012.5,"mild_h":52.6,"mild_n":20.9,"sp_h":22.3,"sp_n":8.8,"generous_h":9.1,"generous_n":3.6},{"name":"Lightsabre","index":"Lightsabre","base":"Phase Blade","code":"7cr","cat":"Weapon","ilvl":66,"req":58,"vh":865.6,"vn":null,"mild_h":54.0,"mild_n":null,"sp_h":23.2,"sp_n":null,"generous_h":9.5,"generous_n":null},{"name":"Wizardspike","index":"Wizardspike","base":"Bone Knife","code":"7dg","cat":"Weapon","ilvl":69,"req":61,"vh":661.3,"vn":null,"mild_h":50.6,"mild_n":null,"sp_h":21.9,"sp_n":null,"generous_h":9.0,"generous_n":null},{"name":"Heaven's Light","index":"Heaven's Light","base":"Mighty Scepter","code":"7sc","cat":"Weapon","ilvl":69,"req":61,"vh":1997.6,"vn":null,"mild_h":53.3,"mild_n":null,"sp_h":22.4,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Death's Web","index":"Deaths's Web","base":"Unearthed Wand","code":"7gw","cat":"Weapon","ilvl":74,"req":66,"vh":6329.8,"vn":null,"mild_h":54.3,"mild_n":null,"sp_h":22.6,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Doombringer","index":"Doombringer","base":"Champion Sword","code":"7b7","cat":"Weapon","ilvl":75,"req":69,"vh":935.7,"vn":null,"mild_h":51.7,"mild_n":null,"sp_h":22.1,"sp_n":null,"generous_h":9.0,"generous_n":null},{"name":"Fleshripper","index":"Fleshripper","base":"Fanged Knife","code":"7kr","cat":"Weapon","ilvl":76,"req":68,"vh":1510.4,"vn":null,"mild_h":52.8,"mild_n":null,"sp_h":22.3,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Eaglehorn","index":"Eaglehorn","base":"Crusader Bow","code":"6l7","cat":"Weapon","ilvl":77,"req":69,"vh":1871.3,"vn":null,"mild_h":53.2,"mild_n":null,"sp_h":22.4,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Windforce","index":"Windforce","base":"Hydra Bow","code":"6lw","cat":"Weapon","ilvl":80,"req":73,"vh":3157.0,"vn":null,"mild_h":53.8,"mild_n":null,"sp_h":22.5,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"The Reaper's Toll","index":"The Reaper's Toll","base":"Thresher","code":"7s8","cat":"Weapon","ilvl":83,"req":75,"vh":465.0,"vn":null,"mild_h":49.0,"mild_n":null,"sp_h":21.6,"sp_n":null,"generous_h":9.0,"generous_n":null},{"name":"The Grandfather","index":"The Grandfather","base":"Colossus Blade","code":"7gd","cat":"Weapon","ilvl":85,"req":81,"vh":1578.5,"vn":null,"mild_h":52.9,"mild_n":null,"sp_h":22.3,"sp_n":null,"generous_h":9.1,"generous_n":null},{"name":"Tomb Reaver","index":"Tomb Reaver","base":"Cryptic Axe","code":"7pa","cat":"Weapon","ilvl":86,"req":84,"vh":923.7,"vn":null,"mild_h":155.3,"mild_n":null,"sp_h":72.0,"sp_n":null,"generous_h":30.1,"generous_n":null},{"name":"Stormlash","index":"Stormlash","base":"Scourge","code":"7fl","cat":"Weapon","ilvl":86,"req":82,"vh":8163.2,"vn":null,"mild_h":182.3,"mild_n":null,"sp_h":77.2,"sp_n":null,"generous_h":31.0,"generous_n":null}];
+const META = {"drop_tables":406,"drop_tables_base":402,"chase_tables":33,"baal_one_in":9};
+const CATS = [...new Set(D.map(r => r.cat))];
+document.querySelectorAll("[data-m]").forEach(e => { e.textContent = META[e.dataset.m]; });
+let preset = "sp", cat = null, sortK = "mh", sortDir = 1;
+const fmt = h => h == null ? null : h >= 100 ? Math.round(h).toLocaleString("en-US") : h >= 10 ? h.toFixed(0) : h.toFixed(1);
+const cell = (h, cls) => h == null ? '<td class="num"><span class="na">—</span></td>' : `<td class="num ${cls||""}">${fmt(h)} h</td>`;
+const lx = h => Math.max(0, Math.min(150, Math.log10(Math.max(1, h)) / 4 * 150));
+function spark(v, m){
+  if (v == null || m == null) return "";
+  return `<svg viewBox="0 0 150 14" role="img" aria-label="${fmt(v)} h vanilla, ${fmt(m)} h modded"><rect x="0" y="6" width="150" height="2" fill="var(--line)"/><rect x="0" y="3" width="${lx(m).toFixed(1)}" height="8" rx="2" fill="var(--bar)"/><rect x="${(lx(v)-1).toFixed(1)}" y="1" width="2" height="12" fill="var(--van)"/></svg>`;
+}
+function rows(){
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  return D.map(r => ({...r, mh: r[preset + "_h"], mn: r[preset + "_n"], x: r.vh && r[preset + "_h"] ? r.vh / r[preset + "_h"] : 0, x2: r[preset + "_h"]}))
+    .filter(r => (!cat || r.cat === cat) && (!q || (r.name + " " + r.base + " " + r.cat).toLowerCase().includes(q)))
+    .sort((a, b) => { const A = a[sortK], B = b[sortK];
+      if (A == null) return 1; if (B == null) return -1;
+      return (typeof A === "string" ? A.localeCompare(B) : A - B) * sortDir; });
+}
+function render(){
+  const R = rows();
+  document.getElementById("tb").innerHTML = R.map(r => `<tr>
+    <td class="name">${r.name}</td><td class="base">${r.base}</td><td class="cat">${r.cat}</td>
+    <td class="num">${r.ilvl}</td><td class="num">${r.req}</td>
+    ${cell(r.vh, "van")}${cell(r.mh, "mod")}
+    <td class="num">${r.x ? "×" + Math.round(r.x) : ""}</td>
+    <td class="spark">${spark(r.vh, r.mh)}</td>
+    ${cell(r.vn, "van")}${cell(r.mn, "mod")}</tr>`).join("");
+  document.getElementById("count").textContent = `${R.length} of ${D.length} uniques shown · preset ${preset}`;
+  const all = D.map(r => r[preset + "_h"]).filter(Boolean).sort((a,b)=>a-b);
+  const med = all[Math.floor(all.length/2)];
+  const perH = D.reduce((s, r) => s + (r[preset + "_h"] ? 1 / r[preset + "_h"] : 0), 0);
+  const vMed = D.map(r => r.vh).sort((a,b)=>a-b)[Math.floor(D.length/2)];
+  document.getElementById("facts").innerHTML = [
+    [D.length, `uniques boosted (${D.filter(r => r.cat === "Class · req 42").length} of them the req-42 class uniques)`],
+    [`${fmt(vMed)} h → ${fmt(med)} h`, "median hours per unique in Hell, vanilla → " + preset],
+    [perH.toFixed(1) + " / h", "listed uniques per Hell hour, all together"],
+    [META.drop_tables, `drop tables get one chase entry; ${META.chase_tables} new chase tables`],
+  ].map(([b, s]) => `<div class="fact"><b>${b}</b><span>${s}</span></div>`).join("");
+  document.querySelectorAll("th").forEach(th => th.setAttribute("aria-sort", th.dataset.k === sortK ? (sortDir > 0 ? "ascending" : "descending") : "none"));
+}
+document.getElementById("chips").innerHTML = ["All", ...CATS].map((c, i) => `<button type="button" class="chip" id="c-${i}" data-c="${i ? c : ""}" aria-pressed="${i ? "false" : "true"}">${c}</button>`).join("");
+document.getElementById("chips").addEventListener("click", e => { const b = e.target.closest(".chip"); if (!b) return;
+  cat = b.dataset.c || null; document.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", x === b)); render(); });
+document.getElementById("presets").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+  preset = b.dataset.p; document.querySelectorAll("#presets button").forEach(x => x.setAttribute("aria-pressed", x === b)); render(); });
+document.querySelector("thead").addEventListener("click", e => { const th = e.target.closest("th"); if (!th) return;
+  const k = th.dataset.k; if (k === sortK) sortDir = -sortDir; else { sortK = k; sortDir = (k === "x") ? -1 : 1; } render(); });
+document.getElementById("q").addEventListener("input", render);
+render();
+</script>

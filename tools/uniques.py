@@ -345,7 +345,7 @@ def expect(T, name, pred, seen=()):
     return picks * sum(w / tot * expect(T, n, pred, seen + (name,)) for n, w in ents)
 
 
-def chase_per_hour(tcs, code=None):
+def chase_per_hour(tcs, code=None, hour=HOUR):
     th = header(tcs)
     T = _tc_dict(tcs, th)
 
@@ -367,7 +367,7 @@ def chase_per_hour(tcs, code=None):
         tot = sum(w for _, w in ents) + nd
         return picks * sum(w / tot * via_chase(n, seen + (name,), inside) for n, w in ents)
 
-    return sum(n * via_chase(t) for t, n in HOUR)
+    return sum(n * via_chase(t) for t, n in hour)
 
 
 def apply(tcs, uniques, cfg, monstats=None):

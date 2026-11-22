@@ -59,7 +59,8 @@ chase_jewelry_rarity = true # SoJ, Bul-Kathos, Mara's, Highlord's... picked more
 # Jalal's, Homunculus, Herald of Zakarum, Oculus), Shako, War Traveler, Vipermagi,
 # Stormshield, Arachnid, Griffon's, Windforce... (full list: CHASE in tools/uniques.py).
 # Every equipment-dropping monster gets a small extra roll that is always one of
-# them, at its level; nothing else gets rarer. Numbers: python tools/uniques.py report
+# them, at its level (champions/uniques drop ~2% fewer regular items, nothing else changes).
+# Every unique with vanilla vs modded hours: docs/uniques-proposal.html
 enabled = true
 # mild | sp | generous | custom  (Hell lvl-85 farming, each listed unique about once every:)
 #   mild 60 h,  sp 25 h,  generous 10 h      (vanilla: ~230 to ~8,000 h each)
