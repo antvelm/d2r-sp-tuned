@@ -1,0 +1,272 @@
+<title>Single-Player Rune Ladder</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: single reading column (~72ch) with full-width data blocks; dark stone first, cool slate light theme. */
+:root {
+  --bg: #f3f4f6; --surface: #ffffff; --sunk: #e8eaee; --line: #d3d7de;
+  --fg: #1c2026; --muted: #5b6370; --accent: #9a5b12; --accent-soft: #f1e3cf;
+  --old: #8b93a1; --new: #b8661a; --good: #2f7a4a; --bad: #a33b2b;
+  --f-display: "Cinzel", "Trajan Pro", Georgia, serif;
+  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15161a; --surface: #1d1f24; --sunk: #111216; --line: #2d3038;
+  --fg: #e6e2da; --muted: #9a978f; --accent: #e3a04a; --accent-soft: #3a2c1a;
+  --old: #6f7480; --new: #e8923a; --good: #6cc28a; --bad: #e07a63; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #15161a; --surface: #1d1f24; --sunk: #111216; --line: #2d3038;
+  --fg: #e6e2da; --muted: #9a978f; --accent: #e3a04a; --accent-soft: #3a2c1a;
+  --old: #6f7480; --new: #e8923a; --good: #6cc28a; --bad: #e07a63; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 80px }
+main { max-width: 980px; margin: 0 auto; display: grid; gap: 56px }
+.prose { max-width: 70ch }
+h1, h2 { font-family: var(--f-display); font-weight: 700; text-wrap: balance; letter-spacing: .02em; margin: 0 }
+h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.1 }
+h2 { font-size: 22px; color: var(--accent) }
+h3 { font-size: 15px; margin: 0 }
+p { margin: 0 }
+section { display: grid; gap: 16px; min-width: 0 }
+.eyebrow { font: 600 12px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted) }
+.lede { font-size: 17px; color: var(--muted); max-width: 66ch }
+code, .mono { font-family: var(--f-mono); font-size: .9em }
+code { background: var(--sunk); padding: 1px 5px; border-radius: 4px }
+.num { font-variant-numeric: tabular-nums; font-family: var(--f-mono) }
+
+/* preset switcher */
+.switch { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.switch button { font: 600 13px/1 var(--f-body); padding: 9px 14px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg) }
+.switch button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg) }
+.switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.switch .hint { color: var(--muted); font-size: 13px }
+
+/* hour strip */
+.hours { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1px; background: var(--line);
+  border: 1px solid var(--line); border-radius: 10px; overflow: hidden }
+.hours div { background: var(--surface); padding: 14px 16px; display: grid; gap: 2px }
+.hours .rune { font-family: var(--f-display); font-weight: 700; font-size: 18px; color: var(--accent) }
+.hours .v { font: 600 20px/1.2 var(--f-mono); font-variant-numeric: tabular-nums }
+.hours .was { font-size: 12px; color: var(--muted) }
+
+/* tables */
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface) }
+table { border-collapse: collapse; width: 100%; font-size: 13px }
+th, td { padding: 8px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line) }
+th:first-child, td:first-child { text-align: left; position: sticky; left: 0; background: var(--surface) }
+thead th { font: 600 11px/1.2 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); background: var(--sunk) }
+thead th:first-child { background: var(--sunk) }
+tbody tr:last-child td { border-bottom: 0 }
+td .old { color: var(--old); display: block; font-size: 11px }
+td .new { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 600 }
+td .x { color: var(--good); font-size: 11px; font-family: var(--f-mono) }
+td .x.down { color: var(--bad) }
+.rn { font-family: var(--f-display); font-weight: 700; color: var(--accent) }
+
+/* chart */
+.chart { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 16px; overflow-x: auto }
+.chart svg { display: block; min-width: 760px; width: 100%; height: auto }
+.legend { display: flex; gap: 18px; font-size: 13px; color: var(--muted); flex-wrap: wrap }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; margin-right: 6px }
+
+/* rows */
+.rows { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px }
+.tc { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 14px 16px; display: grid; gap: 8px; min-width: 0 }
+.tc h3 { font-family: var(--f-mono); font-size: 13px }
+.tc dl { display: grid; grid-template-columns: 1fr auto auto; gap: 2px 14px; margin: 0; font-size: 13px }
+.tc dt { color: var(--muted); overflow-wrap: anywhere }
+.tc dd { margin: 0; text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums }
+.tc dd.o { color: var(--old) }
+.tc dd.chg { color: var(--new); font-weight: 600 }
+
+.levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px }
+.levers > div { display: grid; gap: 8px; align-content: start }
+.levers b { font-family: var(--f-mono); color: var(--accent) }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 6px }
+.callout { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 14px 18px; border-radius: 0 8px 8px 0; display: grid; gap: 6px }
+.decisions { counter-reset: d; list-style: none; padding: 0; gap: 14px }
+.decisions li { counter-increment: d; display: grid; grid-template-columns: 28px 1fr; gap: 10px }
+.decisions li::before { content: counter(d); font: 700 14px/26px var(--f-mono); text-align: center; width: 26px; height: 26px;
+  border-radius: 50%; background: var(--accent-soft); color: var(--accent) }
+footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 20px; display: grid; gap: 6px }
+@media (prefers-reduced-motion: no-preference) { .switch button { transition: background .15s, color .15s } }
+</style>
+
+<main>
+  <header style="display:grid;gap:14px">
+    <span class="eyebrow">d2r-sp-runes · proposal · game build 3.4.95032 · offline only</span>
+    <h1>Single-Player Rune Ladder</h1>
+    <p class="lede">In vanilla Hell, monsters drop runes so rarely that a solo player sees about one Ber per thousand hours.
+      This mod keeps every other drop as it is and makes high runes reachable in a single-player playthrough.
+      All numbers below are computed from the game's own <code>treasureclassex.txt</code>, extracted from this install.</p>
+  </header>
+
+  <section>
+    <div class="switch" role="group" aria-label="Preset">
+      <button type="button" id="p-vanilla" data-p="vanilla">Vanilla</button>
+      <button type="button" id="p-mild" data-p="mild">Mild</button>
+      <button type="button" id="p-sp" data-p="sp">SP (recommended)</button>
+      <button type="button" id="p-generous" data-p="generous">Generous</button>
+      <span class="hint" id="params"></span>
+    </div>
+    <h2>Time to find each rune</h2>
+    <p class="prose">Expected hours of farming per rune. One hour here is 900 normal monsters, 80 champions and 20 unique monsters in level-85 Hell areas (Act 5 drop tables, <code>/players 1</code>). Boss runs come on top of this.</p>
+    <div class="hours" id="hours"></div>
+  </section>
+
+  <section>
+    <h2>Odds per kill</h2>
+    <p class="prose">"1 in N" kills for the runes that gate the big runewords. The small grey number is vanilla and the green figure is how many times more often the rune drops.</p>
+    <div class="scroll"><table id="odds"></table></div>
+  </section>
+
+  <section>
+    <h2>Which runes a Hell rune drop gives</h2>
+    <p class="prose">When an Act 5 Hell monster does drop a rune, this is the chance of each one (log scale). Vanilla drops are almost all low runes. The new curve makes every rune exactly <span class="num" id="qtxt"></span>× rarer than the one below it, so high runes become rare instead of nearly impossible.</p>
+    <div class="legend"><span><i style="background:var(--old)"></i>Vanilla</span><span><i style="background:var(--new)"></i><span id="legname">Preset</span></span></div>
+    <div class="chart"><svg id="curve" viewBox="0 0 960 300" role="img" aria-label="Share of each rune in a Hell Act 5 rune drop, vanilla against preset"></svg></div>
+  </section>
+
+  <section>
+    <h2>How it works</h2>
+    <div class="levers">
+      <div>
+        <h3>1 · Flatten the rune ladder</h3>
+        <p>Each <code>Runes N</code> group holds two runes plus a weighted fall-through to <code>Runes N−1</code>. In vanilla, <code>Runes 17</code> gives Zod weight 1 against 5,170 for falling through, so almost every roll slides down to the low runes. The mod recalculates every fall-through weight from one curve controlled by <b>q</b>.</p>
+      </div>
+      <div>
+        <h3>2 · More runes in the gem/jewelry/rune roll</h3>
+        <p>Every monster drop table has a small chance to roll the gem/jewelry/rune group (<code>Act N Good</code>). The rune entry in that group is multiplied by <b>F</b>. Each monster table then picks the group more often, so rings, amulets, jewels, charms and gems keep their vanilla rates (±0.7% from rounding). The added weight comes out of "drop nothing", so equipment and gold drops don't change at all. In the modded file, the weights in those monster tables are 10 times larger so rounding stays precise. Only their ratios matter.</p>
+      </div>
+    </div>
+    <div class="rows" id="rows"></div>
+  </section>
+
+  <section class="prose">
+    <h2>What stays the same</h2>
+    <ul>
+      <li>Equipment and gold rates are exactly the same as vanilla, and gem and jewelry rates are within 0.7%.</li>
+      <li>Magic Find doesn't affect runes in either version, so this mod doesn't interact with it.</li>
+      <li>Countess keeps her own rune table. She gets the new curve too, but her rune share isn't multiplied, because she is already the best low and mid rune source.</li>
+      <li>Terror-zone and Herald drop tables use the same Good groups, so they scale the same way.</li>
+      <li>Cube rune upgrades are untouched. Making upgrades cheaper (2 runes into 1) is an optional extra lever.</li>
+      <li>The mod only loads with <code>-mods</code>, so Battle.net characters are never affected.</li>
+    </ul>
+  </section>
+
+  <section class="prose">
+    <h2>Mercenary revive cost (separate small change)</h2>
+    <p>The revive price is set in <code>hireling.txt</code>, not in the game code. Every mercenary row has <code>resurrectcostmultiplier = 15</code>, <code>resurrectcostdivisor = 2</code> and <code>resurrectcostmax = 50000</code>.</p>
+    <div class="callout">
+      <p><b>Proposed:</b> divisor <span class="num">2 → 10</span> and max <span class="num">50,000 → 10,000</span>. That makes every revive cost one fifth of vanilla, including the cap.</p>
+    </div>
+    <p>Auto-revive after 30 seconds is not something these data tables can express. It stays a separate mercenary mod with the alternatives discussed earlier (tougher mercenary, regeneration).</p>
+  </section>
+
+  <section class="prose">
+    <h2>Decisions for you</h2>
+    <ol class="decisions">
+      <li><span><b>Preset.</b> SP is the recommendation: about 20 runes an hour, Ist every ~6 h, Ber every ~12 h of farming, and much faster with Baal runs. Any F and q values in between work too.</span></li>
+      <li><span><b>How the mods combine.</b> D2R loads only one mod at a time. The plan is for every repo (runes, mercenaries, uniques) to patch the same <code>mods/SPTuned</code> folder from your own extracted files, so they stack.</span></li>
+      <li><span><b>Where the mercenary cost lives.</b> It can go in this repo now or in a separate <code>d2r-sp-mercs</code> repo.</span></li>
+    </ol>
+  </section>
+
+  <section class="prose">
+    <h2>Next: bosses and uniques</h2>
+    <p>The data supports the "first kill every time" idea. Bosses have separate quest-drop tables (<code>Baalq (H)</code>, <code>Diabloq (H)</code>, <code>Mephistoq (H)</code>) with more picks and better odds, and the regular tables can be pointed at those. Andariel already uses <code>Andarielq (H)</code> every time. Replacing Magic Find with fixed, tuned unique and set rates is a separate mod and a separate proposal.</p>
+  </section>
+
+  <footer>
+    <p>Method: the expected value of every drop chain, following the game's rules for picks, negative (guaranteed) picks and drop-nothing scaling. It ignores the six-item cap per kill and monster-level upgrades to drop tables. Sources: <code>tools/tc_calc.py</code> and <code>tools/runes_mod.py</code> in this repo.</p>
+    <p>Blizzard's game files are not in this repo. The scripts read them from your own install.</p>
+  </footer>
+</main>
+
+<script>
+const DATA = __DATA__;
+const KEY = ["Shael","Lum","Ist","Vex","Ohm","Lo","Sur","Ber","Jah","Cham","Zod"];
+const HOUR_KEY = ["Lum","Ist","Vex","Ohm","Lo","Ber","Jah","Zod"];
+const ALL = DATA.presets.vanilla.ladder.map(r => r.rune);
+const fmt = n => n == null ? "–" : n >= 100 ? Math.round(n).toLocaleString("en-US") : n >= 10 ? n.toFixed(0) : n.toFixed(1);
+const fmtH = h => h == null || !isFinite(h) ? "–" : h >= 1000 ? Math.round(h).toLocaleString("en-US") + " h" : h >= 10 ? Math.round(h) + " h" : h.toFixed(1) + " h";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+let cur = "sp";
+try { const s = localStorage.getItem("rune-preset"); if (s && DATA.presets[s]) cur = s; } catch (e) {}
+
+function render() {
+  const P = DATA.presets[cur], V = DATA.presets.vanilla;
+  document.querySelectorAll(".switch button").forEach(b => b.setAttribute("aria-pressed", b.dataset.p === cur));
+  document.getElementById("params").textContent = P.params ? `F = ${P.params.rune_mult} · q = ${P.params.q}` : "the game's own tables";
+  document.getElementById("qtxt").textContent = P.params ? P.params.q : "1.12";
+  document.getElementById("legname").textContent = cur === "vanilla" ? "Vanilla" : cur[0].toUpperCase() + cur.slice(1);
+
+  // hours
+  document.getElementById("hours").innerHTML = HOUR_KEY.map(r => {
+    const h = 1 / P.hour[r], hv = 1 / V.hour[r];
+    return `<div><span class="rune">${r}</span><span class="v">${fmtH(h)}</span>${cur === "vanilla" ? "<span class='was'>per rune</span>" : `<span class="was">vanilla ${fmtH(hv)}</span>`}</div>`;
+  }).join("");
+
+  // odds table
+  let t = `<thead><tr><th>Source</th>${KEY.map(r => `<th>${r}</th>`).join("")}</tr></thead><tbody>`;
+  P.scenarios.forEach((s, i) => {
+    const vs = V.scenarios[i];
+    t += `<tr><td>${esc(s.label)}</td>` + KEY.map(r => {
+      const n = s.odds[r], o = vs.odds[r];
+      if (n == null) return "<td>–</td>";
+      const x = o ? o / n : null;
+      const xs = cur === "vanilla" || x == null ? "" : `<span class="x${x < 1 ? " down" : ""}">${x >= 10 ? Math.round(x) : x.toFixed(1)}×</span>`;
+      const os = cur === "vanilla" ? "" : `<span class="old">${o ? fmt(o) : "–"}</span>`;
+      return `<td>${os}<span class="new">${fmt(n)}</span> ${xs}</td>`;
+    }).join("") + "</tr>";
+  });
+  document.getElementById("odds").innerHTML = t + "</tbody>";
+
+  drawCurve(V, P);
+  drawRows(V, P);
+}
+
+function drawCurve(V, P) {
+  const W = 960, H = 300, L = 54, R = 12, T = 14, B = 44;
+  const lo = -6, hi = 0; // log10 share
+  const y = v => T + (H - T - B) * (1 - (Math.log10(Math.max(v, 1e-6)) - lo) / (hi - lo));
+  const n = ALL.length, bw = (W - L - R) / n;
+  let s = "";
+  for (let e = lo; e <= hi; e++) {
+    const yy = y(10 ** e);
+    s += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}" stroke="var(--line)" stroke-width="1"/>`;
+    s += `<text x="${L - 8}" y="${yy + 4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--f-mono)">${e === 0 ? "100%" : e === -1 ? "10%" : e === -2 ? "1%" : "1e" + e}</text>`;
+  }
+  ALL.forEach((r, i) => {
+    const x = L + i * bw, v = V.ladder[i].p, p = P.ladder[i].p, w = bw * 0.36;
+    s += `<rect x="${x + bw * 0.12}" y="${y(v)}" width="${w}" height="${Math.max(0, H - B - y(v))}" fill="var(--old)"><title>${r} vanilla ${(v * 100).toPrecision(2)}%</title></rect>`;
+    s += `<rect x="${x + bw * 0.12 + w}" y="${y(p)}" width="${w}" height="${Math.max(0, H - B - y(p))}" fill="var(--new)"><title>${r} ${cur} ${(p * 100).toPrecision(2)}%</title></rect>`;
+    s += `<text x="${x + bw / 2}" y="${H - B + 14}" text-anchor="end" font-size="10" fill="var(--muted)" transform="rotate(-50 ${x + bw / 2} ${H - B + 14})" font-family="var(--f-body)">${r}</text>`;
+  });
+  s += `<line x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}" stroke="var(--muted)" stroke-width="1"/>`;
+  document.getElementById("curve").innerHTML = s;
+}
+
+function drawRows(V, P) {
+  const names = Object.keys(V.rows);
+  document.getElementById("rows").innerHTML = names.map(n => {
+    const a = V.rows[n], b = P.rows[n];
+    const ent = a.entries.map((e, i) => {
+      const nv = b.entries[i] ? b.entries[i][1] : "";
+      const chg = String(nv) !== String(e[1]);
+      return `<dt>${esc(e[0])}</dt><dd class="o">${e[1].toLocaleString("en-US")}</dd><dd class="${chg ? "chg" : ""}">${Number(nv).toLocaleString("en-US")}</dd>`;
+    }).join("");
+    const nd = a.nodrop || b.nodrop ? `<dt>NoDrop</dt><dd class="o">${a.nodrop}</dd><dd class="${a.nodrop !== b.nodrop ? "chg" : ""}">${b.nodrop}</dd>` : "";
+    return `<div class="tc"><h3>${esc(n)}</h3><dl><dt></dt><dd class="o mono" style="font-size:11px">vanilla</dd><dd class="mono" style="font-size:11px">${cur}</dd>${ent}${nd}</dl></div>`;
+  }).join("");
+}
+
+document.querySelectorAll(".switch button").forEach(b => b.addEventListener("click", () => {
+  cur = b.dataset.p; try { localStorage.setItem("rune-preset", cur); } catch (e) {} render();
+}));
+render();
+</script>
