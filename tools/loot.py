@@ -1,4 +1,4 @@
-"""Loot part (PROPOSAL, not wired into build.py yet).
+"""Loot part: chase items tuned for solo play.
 
 Chase items a solo player would otherwise farm for hundreds or thousands of
 hours: uber keys, Ancient Statues, Sunder Charms, unique/set rings and

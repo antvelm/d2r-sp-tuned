@@ -18,12 +18,27 @@ import tomllib
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import bosses  # noqa: E402
+import loot  # noqa: E402
 import mercs  # noqa: E402
 import runes  # noqa: E402
 from tables import read_table, write_table, write_modinfo  # noqa: E402
 
 TABLE_SETS = ("", "base")
-MANAGED = ("treasureclassex", "monstats", "hireling")
+MANAGED = ("treasureclassex", "monstats", "hireling", "uniqueitems")
+LOOT_KEYS = ("uber_keys_mult", "ancient_statue_mult", "sunder_mult", "sunder_even_types",
+             "essence_mult", "jewelry_mult", "jewelry_unique_mod", "jewelry_set_mod",
+             "chase_jewelry_rarity")
+
+
+def loot_params(cfg):
+    p = cfg.get("preset", "sp")
+    if p == "custom":
+        base = dict(loot.PRESETS["sp"])
+        base.update({k: cfg[k] for k in LOOT_KEYS if k in cfg})
+        return base
+    if p in loot.PRESETS:
+        return dict(loot.PRESETS[p])
+    sys.exit(f"settings: unknown loot.preset '{p}' (mild | sp | generous | custom)")
 
 
 def rune_params(cfg):
@@ -53,13 +68,17 @@ def main():
         sys.exit(f"no vanilla tables in {excel}; extract them first (see README)")
     name = s.get("mod_name", "SPTuned")
     mpq = os.path.join(s["game_dir"], "mods", name, f"{name}.mpq")
-    R, B, M = (s.get(k, {}) for k in ("runes", "bosses", "mercs"))
-    on = {k: bool(v.get("enabled", False)) for k, v in (("runes", R), ("bosses", B), ("mercs", M))}
+    R, L, B, M = (s.get(k, {}) for k in ("runes", "loot", "bosses", "mercs"))
+    on = {k: bool(v.get("enabled", False)) for k, v in
+          (("runes", R), ("loot", L), ("bosses", B), ("mercs", M))}
     print("parts:", ", ".join(f"{k} {'ON' if v else 'off'}" for k, v in on.items()))
     if on["runes"]:
         rp = rune_params(R)
         print(f"  runes: preset {R.get('preset', 'sp')} (q={rp['q']}, rune_mult={rp['rune_mult']}, "
               f"countess floor {'on' if rp['countess_floor'] else 'off'})")
+    if on["loot"]:
+        lp = loot_params(L)
+        print(f"  loot: preset {L.get('preset', 'sp')} (" + ", ".join(f"{k}={v}" for k, v in lp.items()) + ")")
 
     for sub in TABLE_SETS:
         src = os.path.join(excel, sub)
@@ -70,17 +89,26 @@ def main():
         tc = tc_v
         if on["runes"]:
             tc = runes.apply(tc_v, **rp)
-            if not a.no_check:
-                fails = runes.floor_check(tc_v, tc)
-                print(f"  excel/{sub}: rune floor check "
-                      + ("OK (no rune rarer than vanilla)" if not fails else f"{len(fails)} runes rarer than vanilla"))
+        if on["loot"]:
+            tc = [list(r) for r in tc]
+            un = read_table(os.path.join(src, "uniqueitems.txt"))
+            log = loot.apply(tc, un, lp)
+            reduced = [line for line in log if "reduced" in line and "Pandemonium Key" not in line]
+            print(f"  excel/{sub}: loot -> {len(log)} table changes"
+                  + (f" ({len(reduced)} tables without NoDrop lose a little of their other drops)" if reduced else ""))
+            if lp.get("chase_jewelry_rarity"):
+                out["uniqueitems"] = un
+        if (on["runes"] or on["loot"]) and not a.no_check:
+            fails = runes.floor_check(tc_v, tc)
+            print(f"  excel/{sub}: rune floor check "
+                  + ("OK (no rune rarer than vanilla)" if not fails else f"{len(fails)} runes rarer than vanilla"))
         if on["bosses"]:
             tc = [list(r) for r in tc]
             ms = read_table(os.path.join(src, "monstats.txt"))
             log = bosses.apply(ms, tc, keep_statues=bool(B.get("keep_ancient_statues", True)))
             print(f"  excel/{sub}: bosses -> {len(log)} boss/difficulty entries now use quest drops")
             out["monstats"] = ms
-        if on["runes"] or on["bosses"]:
+        if on["runes"] or on["loot"] or on["bosses"]:
             out["treasureclassex"] = tc
         if on["mercs"]:
             hl = read_table(os.path.join(src, "hireling.txt"))

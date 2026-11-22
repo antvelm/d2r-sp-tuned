@@ -33,6 +33,26 @@ countess_vanilla_floor = true
 countess_bonus_rolls = 1
 
 
+[loot]
+# Chase items tuned for solo play: uber keys, Ancient Statues, Sunder Charms,
+# SoJ and other endgame rings/amulets, Rainbow Facets. See docs/loot-proposal.html.
+enabled = true
+# mild | sp | generous | custom
+#   sp: keys 1 in 3 runs, statues 1 in 9, SoJ ~every 11 h, facet ~every 5 h
+preset = "sp"
+
+# custom only (1 / 0 / false = vanilla):
+uber_keys_mult = 4          # Key of Terror / Hate / Destruction
+ancient_statue_mult = 3     # Colossal Summit statues from Hell act bosses
+sunder_mult = 4             # Latent Sunder Charms from Heralds (other Herald drops ~1.5% rarer)
+sunder_even_types = true    # all six Sunder types equally likely
+essence_mult = 2            # Token of Absolution essences
+jewelry_mult = 2            # more rings/amulets/jewels/charms (gems and runes unchanged)
+jewelry_unique_mod = 1000   # 0..1024: higher = jewelry more often unique (unique jewel 85+ = Rainbow Facet)
+jewelry_set_mod = 896       # 0..1024: same for set rings/amulets
+chase_jewelry_rarity = true # SoJ, Bul-Kathos, Mara's, Highlord's... picked more often among uniques
+
+
 [bosses]
 # Duriel, Mephisto, Diablo and Baal always drop as on the first (quest) kill.
 enabled = true

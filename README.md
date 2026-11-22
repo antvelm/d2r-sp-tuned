@@ -5,12 +5,13 @@
 | Part | What it does | Default |
 |---|---|---|
 | **Runes** | High runes become reachable: ~1 Ber per 12 h of Hell farming instead of ~1,000 h. No rune drops less often than vanilla from any source. | on, `sp` preset |
+| **Loot** | Chase items reachable solo: uber keys 1 in 3 runs, Ancient Statues 1 in 9, Sunder Charms 4x, SoJ ~every 11 h, Rainbow Facet ~every 5 h. | on, `sp` preset |
 | **Bosses** | Duriel, Mephisto, Diablo and Baal drop as on the first (quest) kill every time. | on |
 | **Mercs** | Reviving a mercenary costs one fifth of vanilla. | on, `0.2` |
 
 **Rune design with all the numbers:** [docs/rune-proposal.html](docs/rune-proposal.html). Download it and open it in a browser; GitHub shows HTML as source.
 
-**Proposed next part, Loot** (uber keys, Ancient Statues, Sunder Charms, SoJ and other endgame jewelry, Rainbow Facets): [docs/loot-proposal.html](docs/loot-proposal.html). Not in the build yet.
+**Loot design with all the numbers:** [docs/loot-proposal.html](docs/loot-proposal.html).
 
 ## Quick start
 
@@ -41,6 +42,19 @@ curve_q = 1.12                # custom: each rune q times rarer than the one bel
 countess_vanilla_floor = true # Countess keeps exact vanilla rune drops plus bonus rolls
 countess_bonus_rolls = 1
 
+[loot]
+enabled = true
+preset = "sp"                 # mild | sp | generous | custom
+uber_keys_mult = 4            # custom: Key of Terror / Hate / Destruction
+ancient_statue_mult = 3       # custom: Colossal Summit statues
+sunder_mult = 4               # custom: Latent Sunder Charms from Heralds
+sunder_even_types = true      # custom: all six Sunder types equally likely
+essence_mult = 2              # custom: Token of Absolution essences
+jewelry_mult = 2              # custom: more rings/amulets/jewels/charms
+jewelry_unique_mod = 1000     # custom: 0..1024, unique odds for jewelry (unique jewel 85+ = Rainbow Facet)
+jewelry_set_mod = 896         # custom: 0..1024, set odds for jewelry
+chase_jewelry_rarity = true   # custom: SoJ, Bul-Kathos, Mara's, Highlord's... picked more often
+
 [bosses]
 enabled = true
 keep_ancient_statues = true   # keep the expansion's Uber Ancient summon drops at vanilla rate
@@ -69,6 +83,13 @@ The build checks all 894 rune-dropping treasure classes at `/players 1` and `/pl
 **Bosses** (`monstats.txt`, `treasureclassex.txt`)
 Each act boss's regular, champion and unique drop columns point at its quest table (`Baalq (H)` and so on): more equipment picks, better quality odds, no gold or junk. Andariel already works this way in vanilla. The expansion's regular Hell Mephisto, Diablo and Baal tables also roll *Ancient Statue* (Uber Ancient summon material), which the quest tables lack. A wrapper (`Baalq (H) SP` = quest table + `Baal (H) Statue Roll`) keeps the statue chance exactly vanilla. Terror-zone boss tables are untouched.
 
+**Loot** (`treasureclassex.txt`, `uniqueitems.txt`)
+- *Item boosts.* Uber key, Ancient Statue, Sunder and essence weights are multiplied wherever they drop; the extra weight comes out of NoDrop, so those tables' other drops keep their rates. Herald tables have no NoDrop, so other Herald drops get ~1.5% rarer with sunders x4.
+- *Jewelry.* The jewelry share of every gem/jewelry/rune table is multiplied (gems and runes kept), and the `Jewelry A/B/C` tables get unique/set quality modifiers. These are the columns the game uses to guarantee Annihilus, and the highest modifier on a drop chain wins. Only rings, amulets, jewels and charms are affected. A unique jewel at item level 85+ is always a Rainbow Facet.
+- *Rarity.* SoJ and Bul-Kathos go from 1.6% to about 12% of unique rings; Mara's, Highlord's, Cat's Eye, Atma's, Metalgrid and Seraph's Hymn get higher weights among amulets.
+
+Works offline: Pandemonium/Uber Tristram, and Diablo Clone (sell **one** SoJ to a vendor in Hell for Annihilus). The Herald Sunder table carries a ladder-season flag, so confirm in one terror-zone session that Heralds drop Sunders offline.
+
 **Mercs** (`hireling.txt`)
 Revive price = multiplier ÷ divisor scaling, capped at max. Setting divisor 2 → 10 and max 50,000 → 10,000 makes every revive one fifth of vanilla. Automatic revival isn't something these data tables can express.
 
@@ -82,10 +103,12 @@ Both table sets the game ships are written: `excel/` (with the 3.x expansion) an
 | `build.py` | Builds the mod from vanilla + settings |
 | `tools/runes.py` | Runes part; `report` / `check` CLI to explore presets |
 | `tools/bosses.py` | Bosses part |
+| `tools/loot.py` | Loot part, plus the quality-odds calculator |
 | `tools/mercs.py` | Mercs part |
 | `tools/tables.py` | Byte-exact table read/write shared by all parts |
 | `tools/tc_calc.py` | Treasure-class calculator: expected runes per kill |
 | `tools/casc_extract.py` | Pulls files out of the game's CASC storage through CascLib |
 | `tools/make_page.py` | Regenerates `docs/rune-proposal.html` (standalone) and `docs/index.html` (artifact version) |
+| `tools/make_loot_page.py` | Regenerates `docs/loot-proposal.html` and `docs/loot-index.html` |
 
 Blizzard's game files are deliberately not in this repo (`reference/` is git-ignored). Everything is generated from your own install.
