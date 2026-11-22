@@ -41,6 +41,8 @@ python tools/runes_mod.py check --preset sp
 python tools/runes_mod.py build --preset sp --mod "C:/Program Files (x86)/Diablo II Resurrected/mods/SPTuned"
 ```
 
+The build writes both table sets the game ships (`excel/` and `excel/base/`) and creates `modinfo.json` with `savepath: "../"`, so your normal offline characters show up in the mod. It rebuilds `treasureclassex.txt` from vanilla, so run other SP mods that patch it afterwards (for example [d2r-sp-bosses](https://github.com/antvelm/d2r-sp-bosses)).
+
 Start the game with `-mods SPTuned -txt` (Battle.net launcher → Game Settings → Additional command line arguments). Mods run offline only.
 
 ## Repository layout

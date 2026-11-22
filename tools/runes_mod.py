@@ -47,21 +47,24 @@ RUNES_RE = re.compile(r"^Runes (\d+)$")
 
 # --------------------------------------------------------------------------- io
 def read_table(path):
-    with open(path, newline="", encoding="utf-8", errors="replace") as f:
-        return list(csv.reader(f, delimiter="\t"))
+    """Raw tab-split. No CSV unquoting: cells like "gld,mul=1280" keep their
+    quotes so untouched cells are written back byte-for-byte."""
+    with open(path, "rb") as f:
+        text = f.read().decode("latin-1")
+    lines = text.split("\r\n")
+    if lines and lines[-1] == "":
+        lines.pop()
+    return [ln.split("\t") for ln in lines]
 
 
 def write_table(rows, path):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    buf = io.StringIO()
-    w = csv.writer(buf, delimiter="\t", lineterminator="\r\n", quoting=csv.QUOTE_MINIMAL)
-    w.writerows(rows)
-    with open(path, "w", encoding="utf-8", newline="") as f:
-        f.write(buf.getvalue())
+    text = "\r\n".join("\t".join(r) for r in rows) + "\r\n"
+    with open(path, "wb") as f:
+        f.write(text.encode("latin-1"))
 
 
 def rows_to_tcs(rows):
-    from tc_calc import load_tcs  # reuse parser via temp string
     hdr = rows[0]
     col = {h: i for i, h in enumerate(hdr)}
     tcs = {}
@@ -137,6 +140,7 @@ def countess_keep_vanilla(rows, col, ic, pc, bonus_picks):
         if m:
             ladder_top = next(r[ic[j]].strip() for j in range(10) if RUNES_RE.match(r[ic[j]].strip()))
             bonus = [""] * len(r)
+            bonus[-1] = r[-1]  # *eol marker, same as vanilla rows
             bonus[0] = r[0].replace("Countess Rune", "Countess Bonus Rune")
             bonus[col["Picks"]] = str(bonus_picks)
             bonus[ic[0]], bonus[pc[0]] = ladder_top, "1"
@@ -316,10 +320,32 @@ def main():
     else:
         if not a.mod:
             sys.exit("--mod required")
-        name = os.path.basename(os.path.normpath(a.mod))
-        dest = os.path.join(a.mod, f"{name}.mpq", "data", "global", "excel", "treasureclassex.txt")
-        write_table(new, dest)
-        print("wrote", dest)
+        mpq = ensure_mod(a.mod)
+        excel = os.path.dirname(a.vanilla)
+        # D2R ships two table sets: excel/ (with the 3.x expansion) and excel/base/.
+        for sub in ("", "base"):
+            src = os.path.join(excel, sub, "treasureclassex.txt")
+            if not os.path.exists(src):
+                continue
+            dest = os.path.join(mpq, "data", "global", "excel", sub, "treasureclassex.txt")
+            write_table(apply_preset(read_table(src), preset), dest)
+            print("wrote", dest)
+        print("note: this rewrites treasureclassex.txt from vanilla; re-run other SP mod "
+              "builds that patch it afterwards (e.g. d2r-sp-bosses).")
+
+
+def ensure_mod(mod_dir):
+    """Create <mod>/<name>.mpq/modinfo.json if missing; return the .mpq path.
+    savepath '../' shares the normal offline save folder, so existing
+    characters show up in the mod (the mod adds no new items)."""
+    name = os.path.basename(os.path.normpath(mod_dir))
+    mpq = os.path.join(mod_dir, f"{name}.mpq")
+    info = os.path.join(mpq, "modinfo.json")
+    if not os.path.exists(info):
+        os.makedirs(mpq, exist_ok=True)
+        with open(info, "w", encoding="utf-8") as f:
+            json.dump({"name": name, "savepath": "../"}, f, indent=2)
+    return mpq
 
 
 if __name__ == "__main__":
