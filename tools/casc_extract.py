@@ -18,7 +18,8 @@ FIND_DATA_SIZE = 8192  # larger than CASC_FIND_DATA; filename is the first field
 
 
 def load(dll_path):
-    lib = ctypes.WinDLL(dll_path)
+    # WinDLL only exists on Windows; on Linux (Steam Deck) load libcasc.so with CDLL.
+    lib = (ctypes.WinDLL if os.name == "nt" else ctypes.CDLL)(dll_path)
     lib.CascOpenStorage.argtypes = [c_char_p, c_uint32, POINTER(c_void_p)]
     lib.CascOpenStorage.restype = ctypes.c_bool
     lib.CascCloseStorage.argtypes = [c_void_p]

@@ -135,7 +135,7 @@ def main():
         return
     write_modinfo(mpq, name, s.get("savepath", "../"))
     print(f"mod written to {os.path.dirname(mpq)}")
-    print(f"launch with: -mods {name} -txt")
+    print(f"launch with: -mod {name} -txt")
 
 
 if __name__ == "__main__":

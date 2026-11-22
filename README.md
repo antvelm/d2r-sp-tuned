@@ -15,7 +15,9 @@
 
 ## Quick start
 
-Requirements: Windows, Python 3.11+, and a built [CascLib](https://github.com/ladislav-zezula/CascLib) `CascLib.dll` (CMake + Visual Studio: `cmake -S . -B build -A x64 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 && cmake --build build --config Release`).
+Requirements: Python 3.11+ and a built [CascLib](https://github.com/ladislav-zezula/CascLib):
+- Windows: `CascLib.dll` (CMake + Visual Studio: `cmake -S . -B build -A x64 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 && cmake --build build --config Release`).
+- Linux / Steam Deck: `libcasc.so` (`cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 && cmake --build build -j`). On SteamOS, build inside a distrobox, since the system has no compiler. Pass the `.so` as `--dll`, and point `game_dir` at the D2R folder inside the Proton prefix.
 
 ```powershell
 # 1. Extract the vanilla data tables from your own install (read-only)
@@ -27,7 +29,7 @@ python tools/casc_extract.py --game "H:/Diablo II Resurrected" --dll path/to/Cas
 python build.py
 ```
 
-Then in the Battle.net launcher: Diablo II: Resurrected → Game Settings → Additional command line arguments: `-mods SPTuned -txt`. Mods work offline only, so Battle.net characters are never affected. With `savepath = "../"` your normal offline characters show up in the mod.
+Then in the Battle.net launcher: Diablo II: Resurrected → Game Settings → Additional command line arguments: `-mod SPTuned -txt`. Mods work offline only, so Battle.net characters are never affected. With `savepath = "../"` your normal offline characters show up in the mod.
 
 `python build.py --dry-run` shows what would change without writing anything. The build always starts from vanilla, so it's safe to re-run after any settings change. A part you switch off has its files removed from the mod folder, so the game uses vanilla for it.
 
