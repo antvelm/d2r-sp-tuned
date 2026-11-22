@@ -18,6 +18,8 @@ Vanilla Hell rune rates assume thousands of players trading on Battle.net. Solo,
 1. **Rune ladder.** The fall-through weights in `Runes 1`–`Runes 17` are recalculated so that each rune is exactly `q` times rarer than the one below it.
 2. **Rune share.** The rune entry in every `Act N Good` treasure class (the gem/jewelry/rune group) is multiplied by `F`. Each monster table picks that group more often, so rings, amulets, jewels, charms and gems keep their vanilla rates (±0.7%). The extra weight comes out of NoDrop, so equipment and gold don't change.
 
+No rune drops less often than vanilla from any source (all 894 rune-dropping tables checked, every preset, `/players 1` and `8`). Countess keeps her exact vanilla rune rolls on an untouched copy of the vanilla ladder and gets one extra roll on the new curve.
+
 Magic Find doesn't affect runes, and the mod doesn't touch it.
 
 ## Requirements
@@ -31,8 +33,9 @@ Magic Find doesn't affect runes, and the mod doesn't touch it.
 # 1. Extract the vanilla data tables from your own install (read-only)
 python tools/casc_extract.py --game "C:/Program Files (x86)/Diablo II Resurrected" --dll path/to/CascLib.dll --filter "excel/" --out reference
 
-# 2. See the odds for a preset
+# 2. See the odds for a preset, and confirm no rune got rarer than vanilla
 python tools/runes_mod.py report --preset sp
+python tools/runes_mod.py check --preset sp
 
 # 3. Write the mod
 python tools/runes_mod.py build --preset sp --mod "C:/Program Files (x86)/Diablo II Resurrected/mods/SPTuned"

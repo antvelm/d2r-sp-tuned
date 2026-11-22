@@ -106,6 +106,58 @@ def ladder(q, top=33):
     return out
 
 
+CLASSIC = " Classic"
+COUNTESS_RUNE_RE = re.compile(r"^Countess Rune( \((N|H)\))?$")
+
+
+def countess_keep_vanilla(rows, col, ic, pc, bonus_picks):
+    """Countess never drops fewer of any rune than in vanilla.
+
+    * Her 'Countess Rune*' TCs are pointed at an untouched copy of the vanilla
+      ladder ('Runes N Classic'), so her guaranteed rune rolls are exactly vanilla.
+    * A new 'Countess Bonus Rune*' TC (same ladder top, new curve) is appended
+      as the LAST entry of her sequential drop list. It only adds drops; if the
+      engine's per-kill item cap is ever hit, this is what gets cut, not vanilla.
+    TCs may only reference TCs defined above them, so new rows are inserted
+    right after the rows they derive from.
+    """
+    names = [r[0] for r in rows]
+    out = []
+    for r in rows:
+        out.append(r)
+        if r[0] == "Runes 12":  # vanilla ladder copy, Runes 1..12 (Countess tops out at 12)
+            for k in range(1, 13):
+                c = list(rows[names.index(f"Runes {k}")])
+                c[0] = f"Runes {k}{CLASSIC}"
+                for j in range(10):
+                    if RUNES_RE.match(c[ic[j]].strip()):
+                        c[ic[j]] = c[ic[j]].strip() + CLASSIC
+                out.append(c)
+        m = COUNTESS_RUNE_RE.match(r[0])
+        if m:
+            ladder_top = next(r[ic[j]].strip() for j in range(10) if RUNES_RE.match(r[ic[j]].strip()))
+            bonus = [""] * len(r)
+            bonus[0] = r[0].replace("Countess Rune", "Countess Bonus Rune")
+            bonus[col["Picks"]] = str(bonus_picks)
+            bonus[ic[0]], bonus[pc[0]] = ladder_top, "1"
+            for j in range(10):
+                if RUNES_RE.match(r[ic[j]].strip()):
+                    r[ic[j]] = r[ic[j]].strip() + CLASSIC
+            out.append(bonus)
+    # append the bonus roll to every Countess top-level (sequential) TC
+    for r in out[1:]:
+        if not r[0].startswith("Countess") or int(r[col["Picks"]] or 0) >= 0:
+            continue
+        rune_tc = next((r[ic[j]].strip() for j in range(10) if COUNTESS_RUNE_RE.match(r[ic[j]].strip())), None)
+        if not rune_tc:
+            continue
+        free = next(j for j in range(10) if not r[ic[j]].strip())
+        r[ic[free]] = rune_tc.replace("Countess Rune", "Countess Bonus Rune")
+        r[pc[free]] = "1"
+        r[col["Picks"]] = str(int(r[col["Picks"]]) - 1)
+    return out
+
+
 def apply_preset(rows, preset):
     if preset is None:
         return rows
@@ -116,6 +168,8 @@ def apply_preset(rows, preset):
     pc = [col[f"Prob{k}"] for k in range(1, 11)]
     for r in rows[1:]:
         r += [""] * (len(hdr) - len(r))
+
+    rows = countess_keep_vanilla(rows, col, ic, pc, preset.get("countess_bonus", 1))
     by_name = {r[0]: r for r in rows[1:] if r and r[0]}
 
     # 1) rune ladder
@@ -220,7 +274,7 @@ def report(rows, players):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["report", "build", "weights"])
+    ap.add_argument("cmd", choices=["report", "build", "weights", "check"])
     ap.add_argument("--preset", default="sp", choices=list(PRESETS))
     ap.add_argument("--vanilla", default=VANILLA)
     ap.add_argument("--players", type=int, default=1)
@@ -232,6 +286,22 @@ def main():
     preset = PRESETS[a.preset]
     new = apply_preset(rows, preset)
 
+    if a.cmd == "check":
+        # Guarantee: no rune from any TC is rarer than in vanilla.
+        tv, tn = rows_to_tcs(rows), rows_to_tcs(new)
+        fails = 0
+        for pl in (1, 8):
+            cv, cn = Calc(tv, pl), Calc(tn, pl)
+            for t in tv:
+                if RUNES_RE.match(t):
+                    continue
+                va, vb = cv.runes(t), cn.runes(t)
+                for i in range(1, 34):
+                    if va[i] > 1e-12 and vb[i] < va[i] * 0.999:
+                        fails += 1
+                        print(f"/players {pl}: {t} {RUNE_NAMES[i]} {vb[i] / va[i]:.3f}x vanilla")
+        print("OK: no rune rarer than vanilla" if not fails else f"FAIL: {fails} reductions")
+        sys.exit(1 if fails else 0)
     if a.cmd == "weights":
         print(ladder(preset["q"]))
     elif a.cmd == "report":
