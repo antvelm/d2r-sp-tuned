@@ -13,6 +13,7 @@ import bosses  # noqa: E402
 import loot  # noqa: E402
 import runes  # noqa: E402
 import uniques  # noqa: E402
+from site_nav import nav  # noqa: E402
 from tables import read_table, header  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -87,7 +88,8 @@ def main():
     json.dump({"meta": meta, "rows": rows}, open(os.path.join(ROOT, "docs", "uniques-data.json"), "w"), indent=1)
     tpl = open(os.path.join(ROOT, "docs", "uniques-template.html"), encoding="utf-8").read()
     html = (tpl.replace("__DATA__", json.dumps(rows, separators=(",", ":")))
-               .replace("__META__", json.dumps(meta, separators=(",", ":"))))
+               .replace("__META__", json.dumps(meta, separators=(",", ":")))
+               .replace("__NAV__", nav("uniques")))
     open(os.path.join(ROOT, "docs", "uniques-index.html"), "w", encoding="utf-8").write(html)
     standalone = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
                   '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'

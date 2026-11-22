@@ -55,6 +55,22 @@ tr:last-child td{border-bottom:0}
 .foot{color:var(--muted);font-size:.82rem}
 </style>
 
+<style>
+.sp-nav{--nv-bg:#ffffff;--nv-fg:#1c1f26;--nv-muted:#5d6472;--nv-line:#d9dce3;--nv-gold:#8a6d2b;--nv-soft:#efe6cf;
+  background:var(--nv-bg);border-bottom:1px solid var(--nv-line);font:500 14px/1.2 "Inter",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .sp-nav{--nv-bg:#1a1c22;--nv-fg:#e7e4dc;--nv-muted:#9aa0ab;--nv-line:#2c2f37;--nv-gold:#c7ab6b;--nv-soft:#2b2618}}
+:root[data-theme="dark"] .sp-nav{--nv-bg:#1a1c22;--nv-fg:#e7e4dc;--nv-muted:#9aa0ab;--nv-line:#2c2f37;--nv-gold:#c7ab6b;--nv-soft:#2b2618}
+.sp-nav .sp-in{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;
+  padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sp-nav .sp-brand{font:700 15px/1 "Cinzel",Georgia,serif;color:var(--nv-gold);letter-spacing:.04em;text-decoration:none}
+.sp-nav .sp-links{display:flex;flex-wrap:wrap;gap:4px}
+.sp-nav a.sp-l{color:var(--nv-muted);text-decoration:none;padding:6px 10px;border-radius:6px}
+.sp-nav a.sp-l:hover{color:var(--nv-fg);background:var(--nv-soft)}
+.sp-nav a.sp-l[aria-current="page"]{color:var(--nv-fg);background:var(--nv-soft);box-shadow:inset 0 -2px 0 var(--nv-gold)}
+.sp-nav a:focus-visible{outline:2px solid var(--nv-gold);outline-offset:2px}
+</style>
+<nav class="sp-nav" aria-label="SPTuned pages"><div class="sp-in"><a class="sp-brand" href="index.html">SPTuned</a><div class="sp-links"><a class="sp-l" href="index.html">Overview</a><a class="sp-l" href="rune-proposal.html">Runes</a><a class="sp-l" href="loot-proposal.html">Loot</a><a class="sp-l" href="uniques-proposal.html" aria-current="page">Uniques</a></div></div></nav>
+
 <div class="wrap">
   <header>
     <div class="lbl">SPTuned · Uniques part · treasureclassex.txt</div>

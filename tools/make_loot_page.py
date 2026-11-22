@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 import bosses  # noqa: E402
 import loot  # noqa: E402
 import runes  # noqa: E402
+from site_nav import nav  # noqa: E402
 from tables import read_table, rows_to_tcs  # noqa: E402
 from tc_calc import Calc  # noqa: E402
 
@@ -109,7 +110,8 @@ def main():
         rune_tpl = open(os.path.join(ROOT, "docs", "template.html"), encoding="utf-8").read()
         style = rune_tpl.split("<style>", 1)[1].split("</style>", 1)[0].strip(chr(10))
         html = (open(tpl, encoding="utf-8").read().replace("__STYLE__", style)
-                .replace("__DATA__", json.dumps(data, separators=(",", ":"))))
+                .replace("__DATA__", json.dumps(data, separators=(",", ":")))
+                .replace("__NAV__", nav("loot")))
         open(os.path.join(ROOT, "docs", "loot-index.html"), "w", encoding="utf-8").write(html)
         standalone = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
                       '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'

@@ -1,4 +1,5 @@
-"""Regenerate docs/index.html from docs/template.html with fresh numbers.
+"""Regenerate docs/rune-proposal.html (standalone) and docs/rune-index.html
+(artifact version) from docs/template.html with fresh numbers.
 
     python tools/make_page.py
 """
@@ -8,6 +9,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 import runes as m  # noqa: E402
+from site_nav import nav  # noqa: E402
 from tables import read_table, rows_to_tcs  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -30,9 +32,9 @@ def main():
         data["presets"][name] = rep
     data["hour_mix"] = m.HOUR_MIX
     tpl = open(os.path.join(ROOT, "docs", "template.html"), encoding="utf-8").read()
-    out = tpl.replace("__DATA__", json.dumps(data, separators=(",", ":")))
+    out = tpl.replace("__DATA__", json.dumps(data, separators=(",", ":"))).replace("__NAV__", nav("runes"))
     # Fragment for the Artifact publisher (it adds doctype/head itself).
-    with open(os.path.join(ROOT, "docs", "index.html"), "w", encoding="utf-8") as f:
+    with open(os.path.join(ROOT, "docs", "rune-index.html"), "w", encoding="utf-8") as f:
         f.write(out)
     # Standalone page to open straight from the repo in any browser.
     standalone = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
@@ -41,7 +43,7 @@ def main():
                   + "\n</body>\n</html>\n")
     with open(os.path.join(ROOT, "docs", "rune-proposal.html"), "w", encoding="utf-8") as f:
         f.write(standalone)
-    print("wrote docs/index.html and docs/rune-proposal.html", len(out) // 1024, "KB")
+    print("wrote docs/rune-index.html and docs/rune-proposal.html", len(out) // 1024, "KB")
 
 
 if __name__ == "__main__":

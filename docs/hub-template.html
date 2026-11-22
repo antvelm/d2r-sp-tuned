@@ -1,0 +1,108 @@
+<title>SPTuned</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: nav bar, short header, a grid of part cards (vanilla -> mod figure on each), then how to build and launch */
+:root{
+  --bg:#f3f4f6; --panel:#ffffff; --sunk:#e9ebef; --fg:#1c1f26; --muted:#5d6472; --line:#d9dce3;
+  --gold:#8a6d2b; --gold-soft:#efe6cf; --van:#a3473a;
+  --display:"Cinzel",Georgia,serif; --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121317; --panel:#1a1c22; --sunk:#101115; --fg:#e7e4dc; --muted:#9aa0ab; --line:#2c2f37;
+  --gold:#c7ab6b; --gold-soft:#2b2618; --van:#e0897b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121317; --panel:#1a1c22; --sunk:#101115; --fg:#e7e4dc; --muted:#9aa0ab; --line:#2c2f37;
+  --gold:#c7ab6b; --gold-soft:#2b2618; --van:#e0897b; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding-block:32px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:32px}
+.eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+h1{font-family:var(--display);color:var(--gold);font-size:2.4rem;margin:4px 0 0;letter-spacing:.03em}
+h2{font-family:var(--display);font-size:1.15rem;margin:0;letter-spacing:.03em}
+.lede{max-width:68ch;color:var(--muted);margin:8px 0 0}
+.parts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.part{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;display:grid;gap:12px;align-content:start;min-width:0}
+.part header{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.pill{font:600 11px/1 var(--mono);padding:4px 8px;border-radius:999px;background:var(--gold-soft);color:var(--gold);white-space:nowrap}
+.part p{margin:0;color:var(--muted);font-size:.92rem}
+.fig{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:.88rem}
+.fig dt{color:var(--fg)}
+.fig dd{margin:0;text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig .v{color:var(--van)}
+.fig .m{color:var(--gold);font-weight:600}
+.go{justify-self:start;color:var(--gold);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+.go:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.nolink{font-size:.82rem;color:var(--muted)}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.how > div{min-width:0;display:grid;gap:8px;align-content:start}
+pre{background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow-x:auto;font:13px/1.55 var(--mono);margin:0}
+.how p{margin:0;color:var(--muted);font-size:.92rem}
+code{font-family:var(--mono);font-size:.88em}
+.foot{color:var(--muted);font-size:.82rem}
+</style>
+
+__NAV__
+<div class="wrap">
+  <header>
+    <div class="eyebrow">d2r-sp-tuned · Diablo II: Resurrected 3.4.95032 · offline single player</div>
+    <h1>SPTuned</h1>
+    <p class="lede">Vanilla drop rates assume thousands of players trading online. SPTuned retunes them for one person playing offline, without Magic Find. Each part below is switched on or off in <code>settings.toml</code>; the build always starts from vanilla data.</p>
+  </header>
+
+  <section class="parts" aria-label="Parts">
+    <article class="part">
+      <header><h2>Runes</h2><span class="pill">preset sp</span></header>
+      <p>Each rune is a fixed step rarer than the one below it, and runes take a bigger slice of gem/jewelry/rune drops. No rune drops less often than vanilla from any source.</p>
+      <dl class="fig"><dt>Ber, Hell farming</dt><dd><span class="v">~1,000 h</span> → <span class="m">~12 h</span></dd>
+        <dt>Ber, Hell Baal (Bosses on)</dt><dd><span class="v">1 in 57,074</span> → <span class="m">1 in 633</span></dd></dl>
+      <a class="go" href="rune-proposal.html">Rune ladder and odds</a>
+    </article>
+
+    <article class="part">
+      <header><h2>Loot</h2><span class="pill">preset sp</span></header>
+      <p>Uber keys, Ancient Statues, Sunder Charms, essences, and endgame rings, amulets and jewels (SoJ, Mara's, Rainbow Facets).</p>
+      <dl class="fig"><dt>Uber key</dt><dd><span class="m">1 in 3 runs</span></dd>
+        <dt>Ancient Statue</dt><dd><span class="m">1 in 9</span></dd>
+        <dt>Stone of Jordan</dt><dd><span class="m">~11 h</span></dd>
+        <dt>Rainbow Facet</dt><dd><span class="m">~5 h</span></dd></dl>
+      <a class="go" href="loot-proposal.html">Loot changes and odds</a>
+    </article>
+
+    <article class="part">
+      <header><h2>Uniques</h2><span class="pill">preset sp</span></header>
+      <p>__UNIQUES__ commonly used uniques, from the required-level-42 class items (Bartuc's, Titan's Revenge, Arreat's Face) to Shako and Griffon's, through an extra level-gated roll in __DROP_TABLES__ drop tables.</p>
+      <dl class="fig"><dt>Median per unique, Hell</dt><dd><span class="v">~__U_VAN__ h</span> → <span class="m">~__U_SP__ h</span></dd>
+        <dt>Hell Baal kill</dt><dd><span class="m">1 in __BAAL_ONE_IN__</span></dd></dl>
+      <a class="go" href="uniques-proposal.html">Every boosted unique</a>
+    </article>
+
+    <article class="part">
+      <header><h2>Bosses</h2><span class="pill">on</span></header>
+      <p>Duriel, Mephisto, Diablo and Baal drop as on the first (quest) kill every time: more equipment picks, better quality odds, no gold or junk. Hell bosses keep their vanilla Ancient Statue chance.</p>
+      <span class="nolink">Details in the README.</span>
+    </article>
+
+    <article class="part">
+      <header><h2>Mercs</h2><span class="pill">0.2</span></header>
+      <p>Reviving a mercenary costs one fifth of vanilla, capped at 10,000 gold instead of 50,000.</p>
+      <span class="nolink">Details in the README.</span>
+    </article>
+  </section>
+
+  <section class="how" aria-label="Build and launch">
+    <div>
+      <h2>Build</h2>
+      <p>Extract the vanilla tables from your own install once, edit <code>settings.toml</code>, then build. The mod goes to <code>&lt;game_dir&gt;/mods/SPTuned</code>.</p>
+      <pre>python tools/casc_extract.py --game "H:/Diablo II Resurrected" \
+  --dll path/to/CascLib.dll --filter "excel/" --out reference
+python build.py            # --dry-run to preview</pre>
+    </div>
+    <div>
+      <h2>Launch</h2>
+      <p>Battle.net launcher → Diablo II: Resurrected → Game Settings → Additional command line arguments. Mods run offline only, so online characters are never affected.</p>
+      <pre>-mod SPTuned -txt</pre>
+    </div>
+  </section>
+
+  <p class="foot">Numbers assume Hell level-85 farming at 900 normal, 80 champion and 20 unique kills an hour, no Magic Find, /players 1. Pages are regenerated by <code>tools/make_page.py</code>, <code>make_loot_page.py</code>, <code>make_uniques_page.py</code> and <code>site_nav.py</code>.</p>
+</div>

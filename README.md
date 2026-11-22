@@ -10,6 +10,8 @@
 | **Bosses** | Duriel, Mephisto, Diablo and Baal drop as on the first (quest) kill every time. | on |
 | **Mercs** | Reviving a mercenary costs one fifth of vanilla. | on, `0.2` |
 
+**All changes in one place:** [docs/index.html](docs/index.html), a hub page with a nav bar to the Runes, Loot and Uniques pages. Download the `docs/` folder and open `index.html` in a browser; GitHub shows HTML as source.
+
 **Rune design with all the numbers:** [docs/rune-proposal.html](docs/rune-proposal.html). Download it and open it in a browser; GitHub shows HTML as source.
 
 **Loot design with all the numbers:** [docs/loot-proposal.html](docs/loot-proposal.html).
@@ -136,8 +138,9 @@ Both table sets the game ships are written: `excel/` (with the 3.x expansion) an
 | `tools/tables.py` | Byte-exact table read/write shared by all parts |
 | `tools/tc_calc.py` | Treasure-class calculator: expected runes per kill |
 | `tools/casc_extract.py` | Pulls files out of the game's CASC storage through CascLib |
-| `tools/make_page.py` | Regenerates `docs/rune-proposal.html` (standalone) and `docs/index.html` (artifact version) |
+| `tools/make_page.py` | Regenerates `docs/rune-proposal.html` (standalone) and `docs/rune-index.html` (artifact version) |
 | `tools/make_loot_page.py` | Regenerates `docs/loot-proposal.html` and `docs/loot-index.html` |
 | `tools/make_uniques_page.py` | Regenerates `docs/uniques-proposal.html` and `docs/uniques-index.html` |
+| `tools/site_nav.py` | Shared nav bar for every page; run it to regenerate the hub `docs/index.html` (and `docs/hub-index.html`) |
 
 Blizzard's game files are deliberately not in this repo (`reference/` is git-ignored). Everything is generated from your own install.
