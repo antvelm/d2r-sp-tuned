@@ -38,6 +38,15 @@ Then in the Battle.net launcher: Diablo II: Resurrected → Game Settings → Ad
 
 `python build.py --dry-run` shows what would change without writing anything. The build always starts from vanilla, so it's safe to re-run after any settings change. A part you switch off has its files removed from the mod folder, so the game uses vanilla for it.
 
+**After a game patch.** The mod ships full copies of the tables it changes, so until you rebuild, the game plays with the old ones: new items, monsters or drop fixes from the patch stay hidden. Re-extract, then rebuild:
+
+```powershell
+python tools/casc_extract.py --game "H:/Diablo II Resurrected" --dll path/to/CascLib.dll --filter "excel/" --out reference
+python build.py
+```
+
+The extractor records the game version (`reference/game-version.txt`) and the build writes it into the mod folder. `python build.py` warns when the extracted tables are older than the installed game, and `python build.py --check` tells you whether the mod is still current without building anything (exit code 1 if not).
+
 ## Settings
 
 ```toml
@@ -105,7 +114,7 @@ Each act boss's regular, champion and unique drop columns point at its quest tab
 Works offline: Pandemonium/Uber Tristram, and Diablo Clone (sell **one** SoJ to a vendor in Hell for Annihilus). The Herald Sunder table carries a ladder-season flag, so confirm in one terror-zone session that Heralds drop Sunders offline.
 
 **Uniques** (`treasureclassex.txt`)
-Most chase uniques are the only unique on their base, so a rarity weight can't single them out. Instead every drop table that can drop equipment (normal, champion, unique, boss and terror-zone tables, all difficulties) gets one extra entry, the same trick the game uses for Annihilus: an `SP Chase uL` table holding the bases of the listed uniques up to unique item level L, with the Unique quality modifier at 1024, so a pick is always that unique. Each table only offers uniques its monsters can roll (table level, +2 for champions, +3 for uniques, the boss's level for boss tables); otherwise the game would make a rare of that base instead. The entry's weight is proportional to the table's equipment weight, so bosses and champions roll it more often, and it comes out of NoDrop, so nothing else drops less. Champion and unique item tables have no NoDrop, so for them it comes out of their equipment entry (about 2% fewer of their regular items).
+Most chase uniques are the only unique on their base, so a rarity weight can't single them out. Instead every drop table that can drop equipment (normal, champion, unique, boss and terror-zone tables, all difficulties) gets one extra entry, the same trick the game uses for Annihilus: an `SP Chase uL` table holding the bases of the listed uniques up to unique item level L, with the Unique quality modifier at 1024, so a pick is always that unique. Each table only offers uniques its monsters can roll (table level, +2 for champions, +3 for uniques, the boss's level for boss tables, lair level +3 for superuniques such as the Countess, Cow King and Council); otherwise the game would make a rare of that base instead. The entry's weight is proportional to the table's equipment weight, so bosses and champions roll it more often, and it comes out of NoDrop, so nothing else drops less. Champion and unique item tables have no NoDrop, so for them it comes out of their equipment entry (about 2% fewer of their regular items).
 
 | Unique (Hell lvl-85 farming, no MF) | vanilla | `sp` |
 |---|---|---|

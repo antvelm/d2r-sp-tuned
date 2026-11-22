@@ -3,6 +3,7 @@
     python build.py                      # build with settings.toml
     python build.py --settings my.toml   # another settings file
     python build.py --dry-run            # show what would change, write nothing
+    python build.py --check              # is the built mod still current for the installed game?
 
 Always starts from the vanilla tables, applies the enabled parts in memory
 (runes -> loot -> uniques -> bosses on treasureclassex.txt, bosses on monstats.txt, mercs on
@@ -22,7 +23,8 @@ import loot  # noqa: E402
 import mercs  # noqa: E402
 import runes  # noqa: E402
 import uniques  # noqa: E402
-from tables import read_table, write_table, write_modinfo  # noqa: E402
+from tables import (read_table, write_table, write_modinfo,  # noqa: E402
+                    game_version, read_version, write_version)
 
 TABLE_SETS = ("", "base")
 MANAGED = ("treasureclassex", "monstats", "hireling", "uniqueitems")
@@ -68,11 +70,38 @@ def rune_params(cfg):
                 countess_bonus_picks=int(cfg.get("countess_bonus_rolls", 1)))
 
 
+def extracted_version(excel):
+    """Game version recorded by casc_extract.py in the extraction root (reference/)."""
+    d = os.path.abspath(excel)
+    for _ in range(5):
+        v = read_version(d)
+        if v:
+            return v
+        d = os.path.dirname(d)
+    return None
+
+
+def version_status(game, tables, label):
+    """Line describing how `tables` (version the data came from) compares to `game`."""
+    if not game:
+        return False, f"installed game version unknown (no .build.info in game_dir); can't check the {label}"
+    if not tables:
+        return False, (f"{label}: game version not recorded. Re-extract with tools/casc_extract.py "
+                       "(it now records the version), then rebuild.")
+    if tables != game:
+        return False, (f"{label} come from game {tables}, but the installed game is {game}. "
+                       "Re-extract with tools/casc_extract.py, then run python build.py, or the mod's "
+                       "old tables hide new items, monsters and fixes from the patch.")
+    return True, f"{label} match the installed game ({game})"
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--settings", default=os.path.join(ROOT, "settings.toml"))
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--no-check", action="store_true", help="skip the rune vanilla-floor check")
+    ap.add_argument("--check", action="store_true",
+                    help="only report whether the built mod and extracted tables match the installed game")
     a = ap.parse_args()
     with open(a.settings, "rb") as f:
         s = tomllib.load(f)
@@ -82,6 +111,23 @@ def main():
         sys.exit(f"no vanilla tables in {excel}; extract them first (see README)")
     name = s.get("mod_name", "SPTuned")
     mpq = os.path.join(s["game_dir"], "mods", name, f"{name}.mpq")
+    mod_dir = os.path.dirname(mpq)
+    game_v, ref_v = game_version(s["game_dir"]), extracted_version(excel)
+    if a.check:
+        ok_ref, line_ref = version_status(game_v, ref_v, "extracted tables")
+        ok_mod, line_mod = version_status(game_v, read_version(mod_dir), "built mod tables")
+        if not os.path.isdir(mod_dir):
+            ok_mod, line_mod = False, f"no mod built yet in {mod_dir}"
+        print(("OK   " if ok_ref else "OLD  ") + line_ref)
+        print(("OK   " if ok_mod else "OLD  ") + line_mod)
+        sys.exit(0 if ok_ref and ok_mod else 1)
+    ok_ref, line_ref = version_status(game_v, ref_v, "extracted tables")
+    if ok_ref:
+        print(line_ref)
+    else:
+        bar = "!" * 78
+        for line in (bar, "WARNING: " + line_ref, bar):
+            print(line)
     R, L, U, B, M = (s.get(k, {}) for k in ("runes", "loot", "uniques", "bosses", "mercs"))
     on = {k: bool(v.get("enabled", False)) for k, v in
           (("runes", R), ("loot", L), ("uniques", U), ("bosses", B), ("mercs", M))}
@@ -120,7 +166,7 @@ def main():
             tc = [list(r) for r in tc]
             un_u = read_table(os.path.join(src, "uniqueitems.txt"))
             ms_u = read_table(os.path.join(src, "monstats.txt"))
-            for line in uniques.apply(tc, un_u, up, ms_u):
+            for line in uniques.apply(tc, un_u, up, ms_u, uniques.superunique_levels(src)):
                 print(f"  excel/{sub}: uniques {line}")
         if (on["runes"] or on["loot"] or on["uniques"]) and not a.no_check:
             fails = runes.floor_check(tc_v, tc)
@@ -158,6 +204,8 @@ def main():
         print("dry run: nothing written")
         return
     write_modinfo(mpq, name, s.get("savepath", "../"))
+    if ref_v:
+        write_version(mod_dir, ref_v)    # lets `python build.py --check` spot a later game patch
     print(f"mod written to {os.path.dirname(mpq)}")
     print(f"launch with: -mod {name} -txt")
 

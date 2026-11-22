@@ -13,6 +13,8 @@ import ctypes
 import os
 import sys
 from ctypes import c_void_p, c_char_p, c_uint32, c_uint64, byref, POINTER
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from tables import VERSION_FILE, game_version, write_version  # noqa: E402
 
 FIND_DATA_SIZE = 8192  # larger than CASC_FIND_DATA; filename is the first field (char[MAX_PATH])
 
@@ -100,6 +102,10 @@ def main():
                 f.write(read_file(lib, storage, name))
             n += 1
         print(f"{n} files", file=sys.stderr)
+        ver = game_version(a.game)
+        if ver and n and not a.list:
+            write_version(a.out, ver)
+            print(f"game version {ver} recorded in {os.path.join(a.out, VERSION_FILE)}", file=sys.stderr)
     finally:
         lib.CascCloseStorage(storage)
 

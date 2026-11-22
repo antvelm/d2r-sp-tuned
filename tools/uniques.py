@@ -21,7 +21,8 @@ Lever: an extra "chase roll", the same trick the game uses for Annihilus.
   Champion/unique item tables have no NoDrop; there it comes out of their
   equipment entry (~1-2% fewer regular items from them).
 * Level gate: a table only offers uniques its monsters can roll (table
-  level, +2 champions, +3 uniques, boss monster level for boss tables).
+  level, +2 champions, +3 uniques, boss monster level for boss tables,
+  lair level +3 for superuniques like the Countess and the Cow King).
   Below that level a unique fails and the game drops a rare of that base
   instead, so the gate is what keeps the roll clean.
 
@@ -199,6 +200,49 @@ def _boss_levels(monstats):
     return out
 
 
+# Superuniques whose drop tables have no level of their own (the rest use
+# 'Act N (H) Super X' tables that carry one). Nightmare/Hell level = area + 3.
+SUPERUNIQUE_LAIRS = {
+    "The Countess": "Tower Cellar Level 5",
+    "The Smith": "Barracks",
+    "Griswold": "Tristram",
+    "The Cow King": "Moo Moo Farm",
+    "The Feature Creep": "River of Flame",     # Hephasto
+    "Ismail Vilehand": "Travincal", "Geleb Flamefinger": "Travincal", "Bremm Sparkfist": "Travincal",
+    "Toorc Icefist": "Travincal", "Wyand Voidfinger": "Travincal", "Maffer Dragonhand": "Travincal",
+}
+
+
+def superunique_levels(excel):
+    """TC name -> monster level for the SUPERUNIQUE_LAIRS tables (Nightmare and Hell,
+    terror-zone variants included: their monsters are at least that level)."""
+    from tables import read_table
+    try:
+        su = read_table(os.path.join(excel, "superuniques.txt"))
+        lv = read_table(os.path.join(excel, "levels.txt"))
+    except OSError:
+        return {}
+    sh, lh = header(su), header(lv)
+    area = {}
+    for r in lv[1:]:     # first match: the Act 1 'Tristram', not the Uber Tristram copy
+        if r and r[lh["LevelName"]]:
+            area.setdefault(r[lh["LevelName"]], r)
+    out = {}
+    for r in su[1:]:
+        lair = SUPERUNIQUE_LAIRS.get(r[0])
+        if not lair or lair not in area:
+            continue
+        for d in ("(N)", "(H)"):
+            a = area[lair][lh["MonLvlEx" + d]].strip()
+            if not a:
+                continue
+            for col in ("TC" + d, "TC" + d + " Desecrated"):
+                t = r[sh[col]].strip() if col in sh else ""
+                if t:
+                    out[t] = min(out.get(t, 999), int(a) + 3)
+    return out
+
+
 def _children_levels(tcs, th, boss_lv):
     """Propagate boss levels into the sub-tables they pick from
     ('Mephisto (H) Desecrated A' -> 'Mephisto Item (H) Desecrated A')."""
@@ -234,12 +278,15 @@ def _gate(name, row, th, eq_rows, lv_of):
     return g
 
 
-def _insert(tcs, th, items, k, monstats):
+def _insert(tcs, th, items, k, monstats, lairs=None):
     """Add chase TCs and entries with chase weight = k * equipment weight
     per drop table. Returns change lines."""
     eq = _equipment_tcs(tcs, th)
     rows = {r[0]: r for r in tcs[1:] if r and r[0]}
-    lv_of = _children_levels(tcs, th, _boss_levels(monstats))
+    seed = _boss_levels(monstats)
+    for t, lv in (lairs or {}).items():
+        seed[t] = min(seed.get(t, 999), lv)
+    lv_of = _children_levels(tcs, th, seed)
     items = sorted(items, key=lambda t: t[2])
     levels = sorted({t[2] for t in items})
     log, used, targets = [], set(), []
@@ -370,7 +417,7 @@ def chase_per_hour(tcs, code=None, hour=HOUR):
     return sum(n * via_chase(t) for t, n in hour)
 
 
-def apply(tcs, uniques, cfg, monstats=None):
+def apply(tcs, uniques, cfg, monstats=None, lairs=None):
     """Mutates tcs in place. cfg: hours_per_item, items (names). Returns log lines."""
     th = header(tcs)
     items, missing = resolve(cfg["items"], uniques)
@@ -379,11 +426,11 @@ def apply(tcs, uniques, cfg, monstats=None):
         return log
     # solve k on a scratch copy: chase drops/hour are linear in k
     trial = copy.deepcopy(tcs)
-    _insert(trial, th, items, 0.01, monstats)
+    _insert(trial, th, items, 0.01, monstats, lairs)
     got = chase_per_hour(trial)
     want = sum(t[3] for t in items) / float(cfg["hours_per_item"])
     k = 0.01 * want / got if got else 0
-    log += _insert(tcs, th, items, k, monstats)
+    log += _insert(tcs, th, items, k, monstats, lairs)
     log.append(f"chase rate k={k:.4f} of equipment weight: ~{chase_per_hour(tcs):.2f} chase uniques "
                f"per Hell lvl-85 hour, ~1 per {cfg['hours_per_item']} h each")
     return log
@@ -456,7 +503,7 @@ def main():
     ms = read_table(os.path.join(a.excel, "monstats.txt"))
     van = unique_rates(tc, un, a.excel)
     mod_tc = [list(r) for r in tc]
-    apply(mod_tc, un, {"hours_per_item": PRESETS[a.preset], "items": list(CHASE)}, ms)
+    apply(mod_tc, un, {"hours_per_item": PRESETS[a.preset], "items": list(CHASE)}, ms, superunique_levels(a.excel))
     mod = unique_rates(mod_tc, un, a.excel)
     inv = {v: k for k, v in CHASE.items()}
     print(f"Hell lvl-85 farming (900 normal / 80 champion / 20 unique kills an hour), no MF, preset {a.preset}")

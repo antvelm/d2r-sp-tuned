@@ -28,19 +28,21 @@ GROUPS = [("Class · req 42", "Bartuc's Cut-Throat"), ("Class · elite", "Jade T
 
 
 def load(excel):
+    """(treasureclassex, uniqueitems, monstats, superunique lair levels) of one table set."""
     return (read_table(os.path.join(excel, "treasureclassex.txt")),
             read_table(os.path.join(excel, "uniqueitems.txt")),
-            read_table(os.path.join(excel, "monstats.txt")))
+            read_table(os.path.join(excel, "monstats.txt")),
+            uniques.superunique_levels(excel))
 
 
-def modded(tc, un, ms, hours):
+def modded(tc, un, ms, lairs, hours):
     m = [list(r) for r in tc]
-    log = uniques.apply(m, un, {"hours_per_item": hours, "items": list(uniques.CHASE)}, ms)
+    log = uniques.apply(m, un, {"hours_per_item": hours, "items": list(uniques.CHASE)}, ms, lairs)
     return m, log
 
 
 def main():
-    tc, un, ms = load(V)
+    tc, un, ms, lairs = load(V)
     uh = header(un)
     U = {r[0]: r for r in un[1:] if r and r[0]}
     names = {}
@@ -53,7 +55,7 @@ def main():
     van_h, van_n = uniques.unique_rates(tc, un, V, HELL), uniques.unique_rates(tc, un, V, NM)
     mod = {}
     for p, h in uniques.PRESETS.items():
-        m, _ = modded(tc, un, ms, h)
+        m, _ = modded(tc, un, ms, lairs, h)
         mod[p] = (uniques.unique_rates(m, un, V, HELL), uniques.unique_rates(m, un, V, NM))
 
     starts = {first: label for label, first in GROUPS}
@@ -70,16 +72,16 @@ def main():
         rows.append({k: round(v, 1) if isinstance(v, float) else v for k, v in row.items()})
 
     # table counts (sp) and chase odds per Hell Baal kill with every part on (sp presets)
-    m, log = modded(tc, un, ms, uniques.PRESETS["sp"])
+    m, log = modded(tc, un, ms, lairs, uniques.PRESETS["sp"])
     drop = int(next(line for line in log if "drop tables get" in line).split()[0])
     chase_tables = sum(1 for r in m if r and r[0].startswith(uniques.PREFIX))
-    tcb, unb, msb = load(os.path.join(V, "base"))
-    _, logb = modded(tcb, unb, msb, uniques.PRESETS["sp"])
+    tcb, unb, msb, lairs_b = load(os.path.join(V, "base"))
+    _, logb = modded(tcb, unb, msb, lairs_b, uniques.PRESETS["sp"])
     drop_b = int(next(line for line in logb if "drop tables get" in line).split()[0])
     full = runes.apply(tc)
     full = [list(r) for r in full]
     loot.apply(full, [list(r) for r in un], loot.PRESETS["sp"])
-    uniques.apply(full, un, {"hours_per_item": uniques.PRESETS["sp"], "items": list(uniques.CHASE)}, ms)
+    uniques.apply(full, un, {"hours_per_item": uniques.PRESETS["sp"], "items": list(uniques.CHASE)}, ms, lairs)
     bosses.apply([list(r) for r in ms], full)
     baal = uniques.chase_per_hour(full, hour=[("Baalq (H) SP", 1)])
     meta = dict(drop_tables=drop, drop_tables_base=drop_b, chase_tables=chase_tables,
