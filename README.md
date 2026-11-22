@@ -4,7 +4,7 @@ Single-player rune rebalance for **Diablo II: Resurrected** (tested against buil
 
 Vanilla Hell rune rates assume thousands of players trading on Battle.net. Solo, a Ber takes on the order of a thousand hours of farming. This mod makes runewords reachable in a single-player game and leaves every other drop alone.
 
-**Proposal with all the numbers:** [docs/index.html](docs/index.html)
+**Proposal with all the numbers:** [docs/rune-proposal.html](docs/rune-proposal.html). Download it and open it in a browser; GitHub shows HTML as source.
 
 | Preset | Rune share ×F | Curve q | Ber (farming) | Ber (Hell Baal) |
 |---|---|---|---|---|
@@ -47,6 +47,6 @@ Start the game with `-mods SPTuned -txt` (Battle.net launcher → Game Settings 
 | `tools/casc_extract.py` | Pulls files out of the game's CASC storage through CascLib |
 | `tools/tc_calc.py` | Treasure-class calculator: expected runes per kill |
 | `tools/runes_mod.py` | Presets, the rebalance itself, reports, build |
-| `tools/make_page.py` | Regenerates `docs/index.html` from `docs/template.html` |
+| `tools/make_page.py` | Regenerates `docs/rune-proposal.html` (standalone) and `docs/index.html` (artifact fragment) from `docs/template.html` |
 
 Blizzard's game files are deliberately not in this repo (`reference/` is git-ignored). Everything is generated from your own install.

@@ -30,9 +30,17 @@ def main():
     data["hour_mix"] = m.HOUR_MIX
     tpl = open(os.path.join(ROOT, "docs", "template.html"), encoding="utf-8").read()
     out = tpl.replace("__DATA__", json.dumps(data, separators=(",", ":")))
+    # Fragment for the Artifact publisher (it adds doctype/head itself).
     with open(os.path.join(ROOT, "docs", "index.html"), "w", encoding="utf-8") as f:
         f.write(out)
-    print("wrote docs/index.html", len(out) // 1024, "KB")
+    # Standalone page to open straight from the repo in any browser.
+    standalone = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
+                  '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
+                  + out.replace("</style>\n", "</style>\n</head>\n<body>\n", 1)
+                  + "\n</body>\n</html>\n")
+    with open(os.path.join(ROOT, "docs", "rune-proposal.html"), "w", encoding="utf-8") as f:
+        f.write(standalone)
+    print("wrote docs/index.html and docs/rune-proposal.html", len(out) // 1024, "KB")
 
 
 if __name__ == "__main__":
