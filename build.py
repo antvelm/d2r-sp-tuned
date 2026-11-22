@@ -7,7 +7,7 @@
 
 Always starts from the vanilla tables, applies the enabled parts in memory
 (runes -> loot -> uniques -> bosses on treasureclassex.txt, bosses on monstats.txt, mercs on
-hireling.txt) and writes both table sets the game ships: excel/ (with the
+hireling.txt, base MF on itemratio.txt) and writes both table sets the game ships: excel/ (with the
 3.x expansion) and excel/base/. Files of disabled parts are removed from the
 mod folder so the game falls back to vanilla for them.
 """
@@ -18,6 +18,7 @@ import tomllib
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
+import basemf  # noqa: E402
 import bosses  # noqa: E402
 import loot  # noqa: E402
 import mercs  # noqa: E402
@@ -27,7 +28,7 @@ from tables import (read_table, write_table, write_modinfo,  # noqa: E402
                     game_version, read_version, write_version)
 
 TABLE_SETS = ("", "base")
-MANAGED = ("treasureclassex", "monstats", "hireling", "uniqueitems")
+MANAGED = ("treasureclassex", "monstats", "hireling", "uniqueitems", "itemratio")
 LOOT_KEYS = ("uber_keys_mult", "ancient_statue_mult", "sunder_mult", "sunder_even_types",
              "essence_mult", "jewelry_mult", "jewelry_unique_mod", "jewelry_set_mod",
              "chase_jewelry_rarity")
@@ -128,9 +129,12 @@ def main():
         bar = "!" * 78
         for line in (bar, "WARNING: " + line_ref, bar):
             print(line)
-    R, L, U, B, M = (s.get(k, {}) for k in ("runes", "loot", "uniques", "bosses", "mercs"))
+    R, L, U, B, M, F = (s.get(k, {}) for k in ("runes", "loot", "uniques", "bosses", "mercs", "base_mf"))
     on = {k: bool(v.get("enabled", False)) for k, v in
-          (("runes", R), ("loot", L), ("uniques", U), ("bosses", B), ("mercs", M))}
+          (("runes", R), ("loot", L), ("uniques", U), ("bosses", B), ("mercs", M), ("base_mf", F))}
+    mf = int(F.get("magic_find", 300))
+    if on["base_mf"] and mf <= 0:
+        on["base_mf"] = False
     print("parts:", ", ".join(f"{k} {'ON' if v else 'off'}" for k, v in on.items()))
     if on["runes"]:
         rp = rune_params(R)
@@ -185,6 +189,11 @@ def main():
             for line in mercs.apply(hl, float(M.get("revive_cost_fraction", 0.2))):
                 print(f"  excel/{sub}: mercs {line}")
             out["hireling"] = hl
+
+        if on["base_mf"]:
+            ir = read_table(os.path.join(src, "itemratio.txt"))
+            print(f"  excel/{sub}: base MF {mf}% -> " + "; ".join(basemf.apply(ir, mf)))
+            out["itemratio"] = ir
 
         if a.dry_run:
             continue

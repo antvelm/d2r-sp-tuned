@@ -82,3 +82,12 @@ keep_ancient_statues = true
 enabled = true
 # Mercenary revive price as a fraction of vanilla (0.2 = one fifth, 1.0 = vanilla).
 revive_cost_fraction = 0.2
+
+
+[base_mf]
+# Built-in Magic Find: every character finds items as if wearing this much MF,
+# so you can wear your strongest gear instead of MF gear. MF you do wear adds on top.
+# Diminishing returns as in the game: 300 -> uniques x2.4, sets x2.9, rares x3, magic x4.
+# Beyond ~500 uniques and sets barely improve. Runes, keys and gems don't use MF.
+enabled = true
+magic_find = 300

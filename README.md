@@ -9,6 +9,7 @@
 | **Uniques** | 63 commonly used uniques (Bartuc's, Titan's Revenge, Arreat's Face and the other level-42 class uniques, Shako, War Traveler, Griffon's, Windforce...) ~every 22 h of Hell farming each instead of 230-8,000 h. | on, `sp` preset |
 | **Bosses** | Duriel, Mephisto, Diablo and Baal drop as on the first (quest) kill every time. | on |
 | **Mercs** | Reviving a mercenary costs one fifth of vanilla. | on, `0.2` |
+| **Base MF** | Every character finds items as if wearing 300% Magic Find, so you wear your strongest gear instead of MF gear. | on, `300` |
 
 **All changes in one place:** [docs/index.html](docs/index.html), a hub page with a nav bar to the Runes, Loot and Uniques pages. Download the `docs/` folder and open `index.html` in a browser; GitHub shows HTML as source.
 
@@ -85,6 +86,10 @@ keep_ancient_statues = true   # keep the expansion's Uber Ancient summon drops a
 [mercs]
 enabled = true
 revive_cost_fraction = 0.2    # 1.0 = vanilla
+
+[base_mf]
+enabled = true
+magic_find = 300              # built-in MF for every character; worn MF adds on top
 ```
 
 | Rune preset | Rune share ×F | Curve q | Ber (farming) | Ber (Hell Baal, with Bosses on) |
@@ -128,6 +133,9 @@ Most chase uniques are the only unique on their base, so a rarity weight can't s
 
 Item level 86-87 uniques need monster level 86+, so in level-85 zones only champions, uniques and bosses roll them (as in vanilla). While levelling, fewer uniques are eligible, so each comes faster: in Nightmare Act 5 Arreat's Face or Bartuc's takes ~9 h instead of 650-860 h. The full list is in [docs/uniques-proposal.html](docs/uniques-proposal.html); `python tools/uniques.py report` prints it too.
 
+**Base MF** (`itemratio.txt`)
+The game rolls each item's quality from `itemratio.txt` and divides the odds by (100 + effective MF) / 100. Effective MF has the game's diminishing returns: at 300% it is 136% for uniques, 187% for sets, 200% for rares and the full 300% for magic items. The part divides every Ratio by that factor and multiplies its Divisor by it, picking the whole-number pair closest to the real MF math (uniques within 4%, sets and rares within 3%), so every drop for every character rolls as if that MF were worn. MF you do wear still applies on top. Runes, keys, gems and the Uniques part's chase roll don't use these odds. The hours on the docs pages are computed without it, so with Base MF on, unique, set and rare drops come about 2.4-3 times as often as the pages show.
+
 **Mercs** (`hireling.txt`)
 Revive price = multiplier ÷ divisor scaling, capped at max. Setting divisor 2 → 10 and max 50,000 → 10,000 makes every revive one fifth of vanilla. Automatic revival isn't something these data tables can express.
 
@@ -144,6 +152,7 @@ Both table sets the game ships are written: `excel/` (with the 3.x expansion) an
 | `tools/loot.py` | Loot part, plus the quality-odds calculator |
 | `tools/uniques.py` | Uniques part; `report` CLI prints vanilla vs modded hours per unique |
 | `tools/mercs.py` | Mercs part |
+| `tools/basemf.py` | Base MF part |
 | `tools/tables.py` | Byte-exact table read/write shared by all parts |
 | `tools/tc_calc.py` | Treasure-class calculator: expected runes per kill |
 | `tools/casc_extract.py` | Pulls files out of the game's CASC storage through CascLib |
