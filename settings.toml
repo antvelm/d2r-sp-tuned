@@ -53,6 +53,23 @@ jewelry_set_mod = 896       # 0..1024: same for set rings/amulets
 chase_jewelry_rarity = true # SoJ, Bul-Kathos, Mara's, Highlord's... picked more often among uniques
 
 
+[uniques]
+# Commonly used unique gear made reachable without Magic Find: the class uniques
+# at required level 42 (Bartuc's, Titan's Revenge, Lycander's, Arreat's Face,
+# Jalal's, Homunculus, Herald of Zakarum, Oculus), Shako, War Traveler, Vipermagi,
+# Stormshield, Arachnid, Griffon's, Windforce... (full list: CHASE in tools/uniques.py).
+# Every equipment-dropping monster gets a small extra roll that is always one of
+# them, at its level; nothing else gets rarer. Numbers: python tools/uniques.py report
+enabled = true
+# mild | sp | generous | custom  (Hell lvl-85 farming, each listed unique about once every:)
+#   mild 60 h,  sp 25 h,  generous 10 h      (vanilla: ~230 to ~8,000 h each)
+preset = "sp"
+hours_per_item = 25   # custom only
+# Change the list (names as in CHASE in tools/uniques.py):
+exclude = []          # e.g. ["Stormlash", "Alma Negra"]
+extra = []            # any other unique by its uniqueitems.txt index, e.g. ["Giantskull"]
+
+
 [bosses]
 # Duriel, Mephisto, Diablo and Baal always drop as on the first (quest) kill.
 enabled = true

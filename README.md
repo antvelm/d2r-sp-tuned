@@ -6,6 +6,7 @@
 |---|---|---|
 | **Runes** | High runes become reachable: ~1 Ber per 12 h of Hell farming instead of ~1,000 h. No rune drops less often than vanilla from any source. | on, `sp` preset |
 | **Loot** | Chase items reachable solo: uber keys 1 in 3 runs, Ancient Statues 1 in 9, Sunder Charms 4x, SoJ ~every 11 h, Rainbow Facet ~every 5 h. | on, `sp` preset |
+| **Uniques** | 63 commonly used uniques (Bartuc's, Titan's Revenge, Arreat's Face and the other level-42 class uniques, Shako, War Traveler, Griffon's, Windforce...) ~every 22 h of Hell farming each instead of 230-8,000 h. | on, `sp` preset |
 | **Bosses** | Duriel, Mephisto, Diablo and Baal drop as on the first (quest) kill every time. | on |
 | **Mercs** | Reviving a mercenary costs one fifth of vanilla. | on, `0.2` |
 
@@ -57,6 +58,13 @@ jewelry_unique_mod = 1000     # custom: 0..1024, unique odds for jewelry (unique
 jewelry_set_mod = 896         # custom: 0..1024, set odds for jewelry
 chase_jewelry_rarity = true   # custom: SoJ, Bul-Kathos, Mara's, Highlord's... picked more often
 
+[uniques]
+enabled = true
+preset = "sp"                 # mild 60 h | sp 25 h | generous 10 h per listed unique | custom
+hours_per_item = 25           # custom only
+exclude = []                  # names from CHASE in tools/uniques.py
+extra = []                    # more uniques, by uniqueitems.txt index
+
 [bosses]
 enabled = true
 keep_ancient_statues = true   # keep the expansion's Uber Ancient summon drops at vanilla rate
@@ -92,6 +100,21 @@ Each act boss's regular, champion and unique drop columns point at its quest tab
 
 Works offline: Pandemonium/Uber Tristram, and Diablo Clone (sell **one** SoJ to a vendor in Hell for Annihilus). The Herald Sunder table carries a ladder-season flag, so confirm in one terror-zone session that Heralds drop Sunders offline.
 
+**Uniques** (`treasureclassex.txt`)
+Most chase uniques are the only unique on their base, so a rarity weight can't single them out. Instead every drop table that can drop equipment (normal, champion, unique, boss and terror-zone tables, all difficulties) gets one extra entry, the same trick the game uses for Annihilus: an `SP Chase uL` table holding the bases of the listed uniques up to unique item level L, with the Unique quality modifier at 1024, so a pick is always that unique. Each table only offers uniques its monsters can roll (table level, +2 for champions, +3 for uniques, the boss's level for boss tables); otherwise the game would make a rare of that base instead. The entry's weight is proportional to the table's equipment weight, so bosses and champions roll it more often, and it comes out of NoDrop, so nothing else drops less. Champion and unique item tables have no NoDrop, so for them it comes out of their equipment entry (about 2% fewer of their regular items).
+
+| Unique (Hell lvl-85 farming, no MF) | vanilla | `sp` |
+|---|---|---|
+| Bartuc's Cut-Throat | ~880 h | ~22 h |
+| Arreat's Face | ~1,100 h | ~22 h |
+| Titan's Revenge | ~320 h | ~21 h |
+| Harlequin Crest (Shako) | ~1,900 h | ~22 h |
+| War Traveler | ~1,600 h | ~22 h |
+| Griffon's Eye | ~6,600 h | ~22 h |
+| Crown of Ages, Arachnid Mesh, Tomb Reaver, Stormlash (item level 86-87) | 900-8,000 h | ~75 h |
+
+Item level 86-87 uniques need monster level 86+, so in level-85 zones only champions, uniques and bosses roll them (as in vanilla). While levelling, fewer uniques are eligible, so each comes faster: in Nightmare Act 5 Arreat's Face or Bartuc's takes ~9 h instead of 650-860 h. `python tools/uniques.py report` prints the full list.
+
 **Mercs** (`hireling.txt`)
 Revive price = multiplier ÷ divisor scaling, capped at max. Setting divisor 2 → 10 and max 50,000 → 10,000 makes every revive one fifth of vanilla. Automatic revival isn't something these data tables can express.
 
@@ -106,6 +129,7 @@ Both table sets the game ships are written: `excel/` (with the 3.x expansion) an
 | `tools/runes.py` | Runes part; `report` / `check` CLI to explore presets |
 | `tools/bosses.py` | Bosses part |
 | `tools/loot.py` | Loot part, plus the quality-odds calculator |
+| `tools/uniques.py` | Uniques part; `report` CLI prints vanilla vs modded hours per unique |
 | `tools/mercs.py` | Mercs part |
 | `tools/tables.py` | Byte-exact table read/write shared by all parts |
 | `tools/tc_calc.py` | Treasure-class calculator: expected runes per kill |

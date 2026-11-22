@@ -5,7 +5,7 @@
     python build.py --dry-run            # show what would change, write nothing
 
 Always starts from the vanilla tables, applies the enabled parts in memory
-(runes -> bosses on treasureclassex.txt, bosses on monstats.txt, mercs on
+(runes -> loot -> uniques -> bosses on treasureclassex.txt, bosses on monstats.txt, mercs on
 hireling.txt) and writes both table sets the game ships: excel/ (with the
 3.x expansion) and excel/base/. Files of disabled parts are removed from the
 mod folder so the game falls back to vanilla for them.
@@ -21,6 +21,7 @@ import bosses  # noqa: E402
 import loot  # noqa: E402
 import mercs  # noqa: E402
 import runes  # noqa: E402
+import uniques  # noqa: E402
 from tables import read_table, write_table, write_modinfo  # noqa: E402
 
 TABLE_SETS = ("", "base")
@@ -39,6 +40,19 @@ def loot_params(cfg):
     if p in loot.PRESETS:
         return dict(loot.PRESETS[p])
     sys.exit(f"settings: unknown loot.preset '{p}' (mild | sp | generous | custom)")
+
+
+def uniques_params(cfg):
+    p = cfg.get("preset", "sp")
+    if p == "custom":
+        hours = float(cfg.get("hours_per_item", 25))
+    elif p in uniques.PRESETS:
+        hours = uniques.PRESETS[p]
+    else:
+        sys.exit(f"settings: unknown uniques.preset '{p}' (mild | sp | generous | custom)")
+    items = cfg.get("items") or list(uniques.CHASE)
+    items = [n for n in items if n not in set(cfg.get("exclude", []))] + list(cfg.get("extra", []))
+    return dict(hours_per_item=hours, items=items)
 
 
 def rune_params(cfg):
@@ -68,9 +82,9 @@ def main():
         sys.exit(f"no vanilla tables in {excel}; extract them first (see README)")
     name = s.get("mod_name", "SPTuned")
     mpq = os.path.join(s["game_dir"], "mods", name, f"{name}.mpq")
-    R, L, B, M = (s.get(k, {}) for k in ("runes", "loot", "bosses", "mercs"))
+    R, L, U, B, M = (s.get(k, {}) for k in ("runes", "loot", "uniques", "bosses", "mercs"))
     on = {k: bool(v.get("enabled", False)) for k, v in
-          (("runes", R), ("loot", L), ("bosses", B), ("mercs", M))}
+          (("runes", R), ("loot", L), ("uniques", U), ("bosses", B), ("mercs", M))}
     print("parts:", ", ".join(f"{k} {'ON' if v else 'off'}" for k, v in on.items()))
     if on["runes"]:
         rp = rune_params(R)
@@ -79,6 +93,10 @@ def main():
     if on["loot"]:
         lp = loot_params(L)
         print(f"  loot: preset {L.get('preset', 'sp')} (" + ", ".join(f"{k}={v}" for k, v in lp.items()) + ")")
+    if on["uniques"]:
+        up = uniques_params(U)
+        print(f"  uniques: preset {U.get('preset', 'sp')} (~1 per {up['hours_per_item']:g} h each, "
+              f"{len(up['items'])} uniques)")
 
     for sub in TABLE_SETS:
         src = os.path.join(excel, sub)
@@ -98,7 +116,13 @@ def main():
                   + (f" ({len(reduced)} tables without NoDrop lose a little of their other drops)" if reduced else ""))
             if lp.get("chase_jewelry_rarity"):
                 out["uniqueitems"] = un
-        if (on["runes"] or on["loot"]) and not a.no_check:
+        if on["uniques"]:
+            tc = [list(r) for r in tc]
+            un_u = read_table(os.path.join(src, "uniqueitems.txt"))
+            ms_u = read_table(os.path.join(src, "monstats.txt"))
+            for line in uniques.apply(tc, un_u, up, ms_u):
+                print(f"  excel/{sub}: uniques {line}")
+        if (on["runes"] or on["loot"] or on["uniques"]) and not a.no_check:
             fails = runes.floor_check(tc_v, tc)
             print(f"  excel/{sub}: rune floor check "
                   + ("OK (no rune rarer than vanilla)" if not fails else f"{len(fails)} runes rarer than vanilla"))
@@ -108,7 +132,7 @@ def main():
             log = bosses.apply(ms, tc, keep_statues=bool(B.get("keep_ancient_statues", True)))
             print(f"  excel/{sub}: bosses -> {len(log)} boss/difficulty entries now use quest drops")
             out["monstats"] = ms
-        if on["runes"] or on["loot"] or on["bosses"]:
+        if on["runes"] or on["loot"] or on["uniques"] or on["bosses"]:
             out["treasureclassex"] = tc
         if on["mercs"]:
             hl = read_table(os.path.join(src, "hireling.txt"))
