@@ -49,6 +49,41 @@ def apply(monstats, tcs, keep_statues=True):
                 index[n] = i + 1
         index[row[0]] = pos
 
+    def has_statue(name, seen=()):
+        if name.startswith(STATUE_PREFIX):
+            return True
+        if name not in index or name in seen:
+            return False
+        return any(has_statue(n, seen + (name,)) for n, _ in _entries(tcs[index[name]], th))
+
+    def statue_roll(name):
+        """Copy of `name`'s TC tree that keeps only the statue rolls, at the
+        same per-pick odds (every other weight becomes NoDrop). Handles
+        statues nested in sub-tables, e.g. Duriel (H) -> Duriel (H) - Base."""
+        roll = f"{name} Statue Roll"
+        if roll in index:
+            return roll
+        src = tcs[index[name]]
+        picks = int(src[th["Picks"]] or 0)
+        kept = []
+        for n, p in _entries(src, th):
+            if n.startswith(STATUE_PREFIX):
+                kept.append((n, p))
+            elif has_statue(n):
+                kept.append((statue_roll(n), p))
+        row = blank_row_like(tcs)
+        row[0] = roll
+        if picks < 0:   # sequential: keep the statue-bearing entries and their counts
+            row[th["Picks"]] = str(-sum(p for _, p in kept))
+        else:           # weighted: same picks, non-statue weight moves to NoDrop
+            total = sum(p for _, p in _entries(src, th)) + int(src[th["NoDrop"]] or 0)
+            row[th["Picks"]] = str(picks)
+            row[th["NoDrop"]] = str(total - sum(p for _, p in kept))
+        for j, (n, p) in enumerate(kept, start=1):
+            row[th[f"Item{j}"]], row[th[f"Prob{j}"]] = n, str(p)
+        insert_after(name, row)
+        return roll
+
     for m in monstats[1:]:
         for d in DIFFS:
             sfx = f"({d[1]})" if d else ""
@@ -59,17 +94,10 @@ def apply(monstats, tcs, keep_statues=True):
             if not Q or Q == R or Q not in index or R not in index:
                 continue
             target = Q
-            reg = tcs[index[R]]
-            statues = [(n, p) for n, p in _entries(reg, th) if n.startswith(STATUE_PREFIX)]
-            if keep_statues and statues:
-                roll, wrap = f"{R} Statue Roll", f"{Q} SP"
+            if keep_statues and has_statue(R) and not has_statue(Q):
+                wrap = f"{Q} SP"
                 if wrap not in index:
-                    total = sum(p for _, p in _entries(reg, th)) + int(reg[th["NoDrop"]] or 0)
-                    r1 = blank_row_like(tcs)
-                    r1[0], r1[th["Picks"]] = roll, reg[th["Picks"]]
-                    r1[th["NoDrop"]] = str(total - sum(p for _, p in statues))
-                    for j, (n, p) in enumerate(statues, start=1):
-                        r1[th[f"Item{j}"]], r1[th[f"Prob{j}"]] = n, str(p)
+                    roll = statue_roll(R)
                     r2 = blank_row_like(tcs)
                     qrow = tcs[index[Q]]
                     r2[0], r2[th["Picks"]] = wrap, "-2"
@@ -77,8 +105,7 @@ def apply(monstats, tcs, keep_statues=True):
                         r2[th[c]] = qrow[th[c]]
                     r2[th["Item1"]], r2[th["Prob1"]] = Q, "1"
                     r2[th["Item2"]], r2[th["Prob2"]] = roll, "1"
-                    insert_after(max(Q, R, key=lambda n: index[n]), r1)
-                    insert_after(roll, r2)
+                    insert_after(max(Q, roll, key=lambda n: index[n]), r2)
                 target = wrap
             changed = []
             for kind in TC_KINDS:
