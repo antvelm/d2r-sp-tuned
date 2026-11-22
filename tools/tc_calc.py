@@ -15,7 +15,6 @@ treasure class, following the game's rules:
 Ignores the 6-items-per-kill cap and quality (MF) since runes have no quality.
 Monster-level TC upgrades are not applied: pass the final TC name.
 """
-import csv
 import math
 import re
 import sys
@@ -25,27 +24,8 @@ RUNE_RE = re.compile(r"^r(\d\d)$")
 
 
 def load_tcs(path):
-    tcs = {}
-    with open(path, newline="", encoding="utf-8", errors="replace") as f:
-        rows = list(csv.reader(f, delimiter="\t"))
-    hdr = rows[0]
-    col = {h: i for i, h in enumerate(hdr)}
-    for r in rows[1:]:
-        if not r or not r[0] or r[0].lower() == "expansion":
-            continue
-        r = r + [""] * (len(hdr) - len(r))
-        entries = []
-        for k in range(1, 11):
-            name = r[col[f"Item{k}"]].strip().strip('"')
-            prob = r[col[f"Prob{k}"]].strip()
-            if name and prob:
-                entries.append((name, int(prob)))
-        tcs[r[0]] = {
-            "picks": int(r[col["Picks"]] or 0),
-            "nodrop": int(r[col["NoDrop"]] or 0),
-            "entries": entries,
-        }
-    return tcs
+    from tables import read_table, rows_to_tcs
+    return rows_to_tcs(read_table(path))
 
 
 def nodrop_for_players(nodrop, total, players):

@@ -1,0 +1,46 @@
+# SPTuned settings. Edit, then run:  python build.py
+# Every part can be switched off on its own; a disabled part's files are
+# removed from the mod folder, so the game uses vanilla data for it.
+
+# Where Diablo II: Resurrected is installed. The mod goes to <game_dir>/mods/<mod_name>.
+game_dir = "H:/Diablo II Resurrected"
+mod_name = "SPTuned"
+
+# Vanilla tables extracted from your install with tools/casc_extract.py.
+vanilla_excel = "reference/data/global/excel"
+
+# Save folder: "../" uses your normal offline characters,
+# "SPTuned/" keeps a separate set of characters just for the mod.
+savepath = "../"
+
+
+[runes]
+enabled = true
+# mild | sp | generous | custom
+#   mild      ~1 Ber per 40 h of Hell farming
+#   sp        ~1 Ber per 12 h (recommended)
+#   generous  ~1 Ber per 6 h
+#   custom    uses rune_mult and curve_q below
+preset = "sp"
+
+# custom only
+rune_mult = 12    # how much bigger the rune slice of gem/jewelry/rune drops is (1 = vanilla)
+curve_q = 1.12    # each rune is q times rarer than the one below it (1 = keep vanilla ladder)
+
+# Countess keeps her exact vanilla rune drops and gets extra rune rolls on the new curve.
+# Turn off to let her use the new curve directly (some of her low runes then get rarer).
+countess_vanilla_floor = true
+countess_bonus_rolls = 1
+
+
+[bosses]
+# Duriel, Mephisto, Diablo and Baal always drop as on the first (quest) kill.
+enabled = true
+# Keep the expansion's Ancient Statue (Uber Ancient summon material) drops at vanilla rates.
+keep_ancient_statues = true
+
+
+[mercs]
+enabled = true
+# Mercenary revive price as a fraction of vanilla (0.2 = one fifth, 1.0 = vanilla).
+revive_cost_fraction = 0.2

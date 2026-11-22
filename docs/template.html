@@ -101,7 +101,7 @@ footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line)
 
 <main>
   <header style="display:grid;gap:14px">
-    <span class="eyebrow">d2r-sp-runes · proposal · game build 3.4.95032 · offline only</span>
+    <span class="eyebrow">d2r-sp-tuned · rune design · game build 3.4.95032 · offline only</span>
     <h1>Single-Player Rune Ladder</h1>
     <p class="lede">In vanilla Hell, monsters drop runes so rarely that a solo player sees about one Ber per thousand hours.
       This mod keeps every other drop as it is and makes high runes reachable in a single-player playthrough.
@@ -163,30 +163,18 @@ footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line)
   </section>
 
   <section class="prose">
-    <h2>Mercenary revive cost (separate small change)</h2>
-    <p>The revive price is set in <code>hireling.txt</code>, not in the game code. Every mercenary row has <code>resurrectcostmultiplier = 15</code>, <code>resurrectcostdivisor = 2</code> and <code>resurrectcostmax = 50000</code>.</p>
-    <div class="callout">
-      <p><b>Proposed:</b> divisor <span class="num">2 → 10</span> and max <span class="num">50,000 → 10,000</span>. That makes every revive cost one fifth of vanilla, including the cap.</p>
-    </div>
-    <p>Auto-revive after 30 seconds is not something these data tables can express. It stays a separate mercenary mod with the alternatives discussed earlier (tougher mercenary, regeneration).</p>
-  </section>
-
-  <section class="prose">
-    <h2>Decisions for you</h2>
-    <ol class="decisions">
-      <li><span><b>Preset.</b> SP is the recommendation: about 20 runes an hour, Ist every ~6 h, Ber every ~12 h of farming, and much faster with Baal runs. Any F and q values in between work too.</span></li>
-      <li><span><b>How the mods combine.</b> D2R loads only one mod at a time. The plan is for every repo (runes, mercenaries, uniques) to patch the same <code>mods/SPTuned</code> folder from your own extracted files, so they stack.</span></li>
-      <li><span><b>Where the mercenary cost lives.</b> It can go in this repo now or in a separate <code>d2r-sp-mercs</code> repo.</span></li>
-    </ol>
-  </section>
-
-  <section class="prose">
-    <h2>Next: bosses and uniques</h2>
-    <p>The data supports the "first kill every time" idea. Bosses have separate quest-drop tables (<code>Baalq (H)</code>, <code>Diabloq (H)</code>, <code>Mephistoq (H)</code>) with more picks and better odds, and the regular tables can be pointed at those. Andariel already uses <code>Andarielq (H)</code> every time. Replacing Magic Find with fixed, tuned unique and set rates is a separate mod and a separate proposal.</p>
+    <h2>The rest of SPTuned</h2>
+    <p>Runes are one of three parts of the SPTuned mod. Each part has an on/off switch in <code>settings.toml</code>, and a part that is switched off falls back to vanilla.</p>
+    <ul>
+      <li><b>Bosses.</b> Duriel, Mephisto, Diablo and Baal always drop from their quest (first-kill) tables: more items, better quality, no gold or junk. Andariel already works this way. The expansion's Ancient Statue drop is kept at its vanilla rate.</li>
+      <li><b>Mercenaries.</b> The revive price is set in <code>hireling.txt</code> (<code>resurrectcostmultiplier 15</code>, <code>resurrectcostdivisor 2</code>, <code>resurrectcostmax 50000</code>). With divisor <span class="num">10</span> and max <span class="num">10,000</span>, a revive costs one fifth of vanilla at every level. The fraction is a setting.</li>
+      <li><b>Runes settings.</b> Pick a preset (<code>mild</code>, <code>sp</code> or <code>generous</code>) or set <code>custom</code> values for F and q. The Countess vanilla floor can be switched off.</li>
+    </ul>
+    <p>Not possible through data tables: automatic mercenary revival after 30 seconds. Replacing Magic Find with fixed unique and set rates would be a future part.</p>
   </section>
 
   <footer>
-    <p>Method: the expected value of every drop chain, following the game's rules for picks, negative (guaranteed) picks and drop-nothing scaling. It ignores the six-item cap per kill and monster-level upgrades to drop tables. Sources: <code>tools/tc_calc.py</code> and <code>tools/runes_mod.py</code> in this repo.</p>
+    <p>Method: the expected value of every drop chain, following the game's rules for picks, negative (guaranteed) picks and drop-nothing scaling. It ignores the six-item cap per kill and monster-level upgrades to drop tables. Sources: <code>tools/tc_calc.py</code> and <code>tools/runes.py</code> in this repo.</p>
     <p>Blizzard's game files are not in this repo. The scripts read them from your own install.</p>
   </footer>
 </main>

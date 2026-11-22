@@ -7,19 +7,20 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
-import runes_mod as m  # noqa: E402
+import runes as m  # noqa: E402
+from tables import read_table, rows_to_tcs  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 SHOW_ROWS = ["Runes 17", "Runes 16", "Runes 12", "Act 5 (H) Good", "Act 5 (H) H2H C"]
 
 
 def tc_rows(rows):
-    tcs = m.rows_to_tcs(rows)
+    tcs = rows_to_tcs(rows)
     return {n: tcs[n] for n in SHOW_ROWS}
 
 
 def main():
-    vanilla = m.read_table(m.VANILLA)
+    vanilla = read_table(m.VANILLA)
     data = {"presets": {}}
     for name, preset in m.PRESETS.items():
         rows = m.apply_preset(vanilla, preset)
